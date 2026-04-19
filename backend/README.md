@@ -77,3 +77,12 @@ python manage.py runserver
 ```
 
 The application will be running at `http://127.0.0.1:8000/`.
+
+### 8. Running Automated Tests
+
+To ensure the API and database logic are functioning properly against edge-cases, run the comprehensive testing suite:
+
+```bash
+pytest -v
+```
+All tests should pass indicating that the backend APIs successfully catch missing fields, invalid types, and handle edge cases gracefully.

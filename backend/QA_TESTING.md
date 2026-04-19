@@ -3,8 +3,8 @@
 This document tracks the tasks and guidelines for QA Testing (B4 Requirements).
 
 ## Testing Strategy
-1. **Unit Testing**: Run `python manage.py test` to execute all unit tests located in `sales/tests.py`. All code must pass unit tests before merging to the `main` branch.
-2. **Integration Testing**: APIs should be tested end-to-end (e.g., via Postman or Frontend forms) to ensure the database correctly records and updates models (Customer Inquiries, Appointments, Feedback).
+1. **Automated API & Unit Testing (Pytest)**: We use `pytest` and `pytest-django` to automatically validate Edge Cases and Database logic. Run `pytest -v` inside the `backend` directory to execute all tests in bulk. All code must pass before merging.
+2. **Integration Testing**: APIs should be tested end-to-end linking via Frontend forms to ensure the database correctly records and updates models (Customer Inquiries, Appointments, Feedback).
 
 ## Bug Tracking Process
 - Report all bugs in the project issue tracker (GitHub Issues or designated Bug Tracking Sheet).
