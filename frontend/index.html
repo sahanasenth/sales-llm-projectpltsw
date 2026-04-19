@@ -1,1 +1,1729 @@
+<!DOCTYPE html>
+<!-- saved from url=(0060)file:///C:/Users/p0376/OneDrive/Desktop/PSoftware/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales CRM Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+  <link href="./Sales CRM_files/css2" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-2: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --primary: #0f6c5c;
+      --primary-dark: #0a4d42;
+      --primary-soft: #e7f5f1;
+      --blue: #2563eb;
+      --blue-soft: #eff6ff;
+      --green: #059669;
+      --green-soft: #ecfdf5;
+      --gray-soft: #f1f5f9;
+      --amber-soft: #fffbeb;
+      --amber: #d97706;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+      --sidebar-width: 284px;
+      --sidebar-collapsed: 88px;
+    }
 
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+    body { min-height: 100vh; }
+    button, input, select, textarea { font: inherit; }
+    a { text-decoration: none; color: inherit; }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      min-height: 100vh;
+      transition: grid-template-columns 0.25s ease;
+    }
+    .app-shell.sidebar-collapsed {
+      grid-template-columns: var(--sidebar-collapsed) 1fr;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: linear-gradient(180deg, #0d3f37 0%, #0b2f2a 100%);
+      color: #e5f6f2;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      min-height: 58px;
+    }
+    .brand-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.14);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      flex: 0 0 auto;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+    }
+    .brand-copy h1 { font-size: 15px; margin: 0; font-weight: 800; }
+    .brand-copy p { margin: 4px 0 0; color: rgba(229,246,242,0.72); font-size: 12px; }
+
+    .nav-group-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(229,246,242,0.58);
+      margin: 8px 10px 2px;
+      font-weight: 700;
+    }
+    .nav-menu { display: flex; flex-direction: column; gap: 6px; }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color: rgba(229,246,242,0.86);
+      transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+      border: 1px solid transparent;
+    }
+    .nav-link:hover { background: rgba(255,255,255,0.08); transform: translateX(2px); }
+    .nav-link.active {
+      background: rgba(255,255,255,0.14);
+      color: #ffffff;
+      border-color: rgba(255,255,255,0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .nav-icon { width: 22px; text-align: center; font-size: 18px; flex: 0 0 auto; }
+    .nav-text { font-size: 14px; font-weight: 600; white-space: nowrap; }
+
+    .sidebar-footer {
+      margin-top: auto;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .sidebar-footer h3 { margin: 0 0 6px; font-size: 14px; }
+    .sidebar-footer p { margin: 0; font-size: 12px; line-height: 1.5; color: rgba(229,246,242,0.72); }
+
+    .main { min-width: 0; display: flex; flex-direction: column; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(244, 247, 251, 0.82);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(148,163,184,0.16);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px 28px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1; }
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: var(--text);
+      box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+    }
+    .search-box {
+      flex: 1;
+      min-width: 220px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0 14px;
+      height: 46px;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+    }
+    .search-box input { flex: 1; border: 0; outline: none; background: transparent; color: var(--text); }
+    .topbar-right { display: flex; align-items: center; gap: 12px; position: relative; }
+    .avatar-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 6px 6px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+    }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), #16a085);
+      color: white;
+      font-weight: 800;
+    }
+    .avatar-copy strong { display: block; font-size: 13px; line-height: 1.1; }
+    .avatar-copy span { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .profile-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 10px);
+      width: 210px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 8px;
+      display: none;
+    }
+    .profile-menu.open { display: block; }
+    .profile-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .profile-item:hover { background: var(--panel-2); }
+
+    .page { padding: 28px; display: flex; flex-direction: column; gap: 22px; }
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .page-title h2 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.03em; }
+    .page-title p { margin: 8px 0 0; color: var(--muted); line-height: 1.5; max-width: 760px; }
+    .page-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .btn { height: 44px; border-radius: 12px; padding: 0 16px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font-weight: 600; cursor: pointer; }
+    .btn-primary { border-color: transparent; background: linear-gradient(135deg, var(--primary), #17856f); color: white; box-shadow: 0 10px 20px rgba(15,108,92,0.18); }
+    .btn-secondary { background: var(--panel-2); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(226,232,240,0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .stat-card { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .stat-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-size: 20px;
+    }
+    .stat-card small { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+    .stat-card h3 { margin: 0; font-size: 26px; letter-spacing: -0.03em; }
+    .trend { font-size: 12px; font-weight: 700; color: var(--green); }
+
+    .split-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; }
+    .card-header {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .card-header h3 { margin: 0; font-size: 18px; }
+    .card-header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .card-body { padding: 18px 20px 20px; }
+
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    .toolbar-left, .toolbar-right { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .control { height: 42px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); padding: 0 14px; color: var(--text); min-width: 130px; outline: none; }
+    .control.search { min-width: 240px; }
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 720px; }
+    th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--line); font-size: 14px; }
+    th { color: var(--muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; background: #fbfdff; position: sticky; top: 0; }
+    tbody tr:hover { background: #f8fbfd; }
+
+    .badge { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .badge.submitted { background: var(--blue-soft); color: var(--blue); }
+    .badge.draft { background: var(--gray-soft); color: #475569; }
+    .badge.closed, .badge.completed { background: var(--green-soft); color: var(--green); }
+    .badge.pending, .badge.scheduled { background: var(--amber-soft); color: var(--amber); }
+    .badge.hot { background: #fef2f2; color: #dc2626; }
+    .badge.warm { background: #fff7ed; color: #ea580c; }
+    .badge.cold { background: #eff6ff; color: #2563eb; }
+
+    .empty-state { padding: 26px 20px; color: var(--muted); text-align: center; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: var(--panel);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .field input.error, .field select.error, .field textarea.error {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.10);
+    }
+    .field .error-msg { font-size: 11px; color: #dc2626; margin-top: 2px; display: none; }
+    .field.has-error .error-msg { display: block; }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: rgba(15,108,92,0.4);
+      box-shadow: 0 0 0 4px rgba(15,108,92,0.08);
+    }
+    .field textarea { min-height: 120px; resize: vertical; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+    .form-section { grid-column: 1 / -1; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+    .form-section:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+    .form-section h4 { margin: 0 0 12px; font-size: 14px; font-weight: 800; letter-spacing: 0.02em; }
+
+    .field-hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    .choice-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .choice-chip { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+    .choice-chip input { position: absolute; opacity: 0; pointer-events: none; }
+    .choice-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 92px;
+      height: 42px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .choice-chip input:checked + .choice-pill { border-color: transparent; box-shadow: 0 8px 18px rgba(15,23,42,0.08); }
+    .choice-chip.hot input:checked + .choice-pill { background: #fef2f2; color: #dc2626; }
+    .choice-chip.warm input:checked + .choice-pill { background: #fff7ed; color: #ea580c; }
+    .choice-chip.cold input:checked + .choice-pill { background: #eff6ff; color: #2563eb; }
+
+    .conditional-section {
+      grid-column: 1 / -1;
+      display: none;
+      padding: 16px;
+      border: 1px dashed var(--line);
+      border-radius: 16px;
+      background: #fbfdff;
+    }
+    .conditional-section.show { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+
+    .helper-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-size: 14px;
+      line-height: 1.5;
+      border: 1px solid rgba(15,108,92,0.12);
+    }
+
+    .list-stack { display: flex; flex-direction: column; gap: 12px; }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+    }
+    .list-item strong { display: block; font-size: 14px; }
+    .list-item span { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    .sidebar-collapsed .brand-copy,
+    .sidebar-collapsed .nav-text,
+    .sidebar-collapsed .nav-group-title,
+    .sidebar-collapsed .sidebar-footer { display: none; }
+    .sidebar-collapsed .brand,
+    .sidebar-collapsed .nav-link { justify-content: center; }
+
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
+    .toast {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 18px;
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 260px;
+      animation: slideIn 0.25s ease;
+    }
+    .toast.success { border-left: 4px solid var(--green); }
+    .toast.error { border-left: 4px solid #dc2626; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 1180px) {
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 900px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; z-index: 40; width: var(--sidebar-width); transform: translateX(-100%); transition: transform 0.25s ease; }
+      .app-shell.mobile-sidebar-open .sidebar { transform: translateX(0); }
+      .main { width: 100%; }
+      .page, .topbar { padding-left: 18px; padding-right: 18px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .avatar-copy { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar" id="sidebar">
+          <div class="brand">
+            <div class="brand-badge">SC</div>
+            <div class="brand-copy">
+              <h1>Sales Command</h1>
+              <p>Professional CRM Workspace</p>
+            </div>
+          </div>
+          
+            <div>
+              <div class="nav-group-title">Workspace</div>
+              <div class="nav-menu">
+            <div class="nav-link " data-nav="dashboard" role="button" tabindex="0">
+              <span class="nav-icon">⌂</span>
+              <span class="nav-text">Dashboard</span>
+            </div>
+          </div>
+            </div>
+          
+            <div>
+              <div class="nav-group-title">Sales</div>
+              <div class="nav-menu">
+            <div class="nav-link active" data-nav="sales-enquiries" role="button" tabindex="0">
+              <span class="nav-icon">▣</span>
+              <span class="nav-text">Sales Enquiries</span>
+            </div>
+          
+            <div class="nav-link " data-nav="enquiry-form" role="button" tabindex="0">
+              <span class="nav-icon">✎</span>
+              <span class="nav-text">Enquiry Form</span>
+            </div>
+          
+            <div class="nav-link " data-nav="appointments" role="button" tabindex="0">
+              <span class="nav-icon">🗓</span>
+              <span class="nav-text">Appointment Booking</span>
+            </div>
+          
+            <div class="nav-link " data-nav="feedback" role="button" tabindex="0">
+              <span class="nav-icon">☰</span>
+              <span class="nav-text">Sales Feedback</span>
+            </div>
+          </div>
+            </div>
+          
+          <div class="sidebar-footer">
+            <h3>Module Scope</h3>
+            <p>Enquiries · Appointments · Feedback · Modular architecture</p>
+          </div>
+        </aside>
+    <div class="main">
+      <header class="topbar" id="topbar">
+          <div class="topbar-left">
+            <button class="icon-btn" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+            <div class="search-box">
+              <span>⌕</span>
+              <input id="globalSearch" type="text" placeholder="Search customers, vehicles, or records" value="">
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button class="icon-btn" title="Notifications">🔔</button>
+            <button class="icon-btn" title="Help">?</button>
+            <div style="position:relative;">
+              <button class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
+                <div class="avatar">DK</div>
+                <div class="avatar-copy">
+                  <strong>Sales Executive</strong>
+                  <span>CRM Workspace</span>
+                </div>
+              </button>
+              <div class="profile-menu" id="profileMenu" role="menu">
+                <div class="profile-item" role="menuitem">👤 Profile</div>
+                <div class="profile-item" role="menuitem">⚙ Settings</div>
+                <div class="profile-item" role="menuitem">⇥ Sign out</div>
+              </div>
+            </div>
+          </div>
+        </header>
+      <main class="page" id="pageRoot">
+          <section class="page-header">
+            <div class="page-title">
+              <h2>Sales Enquiries</h2>
+              <p>All customer enquiries with status, lead temperature, and vehicle details. Filter by status, vehicle, or date.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-primary" data-nav="enquiry-form">Add Enquiry</button>
+            </div>
+          </section>
+          
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>Enquiry Records</h3>
+                <p>Reusable table with status, vehicle, and date filters.</p>
+              </div>
+              
+            </div>
+            <div class="card-body">
+          
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <select class="control" data-filter="enquiries" data-filter-key="status">
+                <option value="all" selected="">All Status</option>
+                <option value="submitted">Submitted</option><option value="draft">Draft</option><option value="closed">Closed</option>
+              </select>
+              <select class="control" data-filter="enquiries" data-filter-key="vehicle">
+                <option value="all" selected="">All Vehicles</option>
+                <option value="fa">FA</option><option value="220">220</option><option value="fascino">Fascino</option><option value="fz-s">FZ-S</option><option value="rayzr">RayZR</option><option value="mt-15">MT-15</option><option value="xsr">XSR</option><option value="fz-x">FZ-X</option><option value="r15">R15</option><option value="aerox">Aerox</option>
+              </select>
+              <select class="control" data-filter="enquiries" data-filter-key="date">
+                <option value="all" selected="">All Dates</option>
+                <option value="2026-04">2026-04</option>
+              </select>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn btn-primary" data-nav="enquiry-form">Open Form</button>
+            </div>
+          </div>
+        
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Customer Name</th><th>Vehicle Model</th><th>Lead Temp</th><th>Status</th><th>Date</th><th>Source</th></tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>SE-53446</td><td>Pavan</td><td>FA</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-19</td><td>Walk-in</td>
+              </tr>
+            
+              <tr>
+                <td>SE-12806</td><td>Raja</td><td>220</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-19</td><td>Walk-in</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00054</td><td>Rithwik</td><td>Fascino</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-14</td><td>Walk-in</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00053</td><td>Siva</td><td>FZ-S</td><td><span class="badge warm">Warm</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-13</td><td>Phone</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00052</td><td>Raja</td><td>RayZR</td><td><span class="badge cold">Cold</span></td><td><span class="badge draft">Draft</span></td><td>2026-04-13</td><td>Website</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00051</td><td>Vadivelu</td><td>MT-15</td><td><span class="badge warm">Warm</span></td><td><span class="badge closed">Closed</span></td><td>2026-04-12</td><td>Referral</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00050</td><td>Naveen</td><td>XSR</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-11</td><td>Walk-in</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00049</td><td>Kesavan</td><td>FZ-X</td><td><span class="badge cold">Cold</span></td><td><span class="badge draft">Draft</span></td><td>2026-04-10</td><td>Phone</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00048</td><td>Rathish</td><td>R15</td><td><span class="badge warm">Warm</span></td><td><span class="badge closed">Closed</span></td><td>2026-04-10</td><td>Website</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00047</td><td>Anitha</td><td>Fascino</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-09</td><td>Walk-in</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00046</td><td>Deepa</td><td>Aerox</td><td><span class="badge warm">Warm</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-08</td><td>Referral</td>
+              </tr>
+            
+              <tr>
+                <td>SE-00045</td><td>Mohan</td><td>RayZR</td><td><span class="badge cold">Cold</span></td><td><span class="badge draft">Draft</span></td><td>2026-04-08</td><td>Website</td>
+              </tr>
+            </tbody>
+            </table>
+          </div>
+        </div>
+          </section>
+        
+        </main>
+    </div>
+  </div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    /* ═══════════════════════════════════════════════════════════════
+       STATE
+    ═══════════════════════════════════════════════════════════════ */
+    const appState = {
+      currentView: 'dashboard',
+      sidebarCollapsed: false,
+      mobileSidebarOpen: false,
+      search: '',
+      filters: {
+        enquiries:    { status: 'all', vehicle: 'all', date: 'all' },
+        appointments: { status: 'all', vehicle: 'all', date: 'all' },
+        feedback:     { status: 'all', vehicle: 'all', date: 'all' }
+      },
+      formDraft: {}
+    };
+
+    const UI_STATE_STORAGE_KEY = 'uiState';
+
+    /* ═══════════════════════════════════════════════════════════════
+       DATA STORE
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* ── Seed data (used only when localStorage is empty) ── */
+    const SEED = {
+      enquiries: [
+        { id: 'SE-00054', customer: 'Rithwik',  vehicle: 'Fascino', temperature: 'Hot',  status: 'Submitted', date: '2026-04-14', source: 'Walk-in'  },
+        { id: 'SE-00053', customer: 'Siva',      vehicle: 'FZ-S',    temperature: 'Warm', status: 'Submitted', date: '2026-04-13', source: 'Phone'    },
+        { id: 'SE-00052', customer: 'Raja',      vehicle: 'RayZR',   temperature: 'Cold', status: 'Draft',     date: '2026-04-13', source: 'Website'  },
+        { id: 'SE-00051', customer: 'Vadivelu',  vehicle: 'MT-15',   temperature: 'Warm', status: 'Closed',    date: '2026-04-12', source: 'Referral' },
+        { id: 'SE-00050', customer: 'Naveen',    vehicle: 'XSR',     temperature: 'Hot',  status: 'Submitted', date: '2026-04-11', source: 'Walk-in'  },
+        { id: 'SE-00049', customer: 'Kesavan',   vehicle: 'FZ-X',    temperature: 'Cold', status: 'Draft',     date: '2026-04-10', source: 'Phone'    },
+        { id: 'SE-00048', customer: 'Rathish',   vehicle: 'R15',     temperature: 'Warm', status: 'Closed',    date: '2026-04-10', source: 'Website'  },
+        { id: 'SE-00047', customer: 'Anitha',    vehicle: 'Fascino', temperature: 'Hot',  status: 'Submitted', date: '2026-04-09', source: 'Walk-in'  },
+        { id: 'SE-00046', customer: 'Deepa',     vehicle: 'Aerox',   temperature: 'Warm', status: 'Submitted', date: '2026-04-08', source: 'Referral' },
+        { id: 'SE-00045', customer: 'Mohan',     vehicle: 'RayZR',   temperature: 'Cold', status: 'Draft',     date: '2026-04-08', source: 'Website'  }
+      ],
+      appointments: [
+        { id: 'SABP-0001', customer: 'Rithwik', vehicle: 'Fascino', status: 'Scheduled', date: '2026-04-18', time: '10:30 AM' },
+        { id: 'SABP-0002', customer: 'Anitha',  vehicle: 'Fascino', status: 'Completed', date: '2026-04-17', time: '12:00 PM' },
+        { id: 'SABP-0003', customer: 'Naveen',  vehicle: 'XSR',     status: 'Scheduled', date: '2026-04-19', time: '03:30 PM' },
+        { id: 'SABP-0004', customer: 'Raja',    vehicle: 'RayZR',   status: 'Pending',   date: '2026-04-20', time: '11:15 AM' },
+        { id: 'SABP-0005', customer: 'Siva',    vehicle: 'FZ-S',    status: 'Completed', date: '2026-04-15', time: '04:15 PM' }
+      ],
+      feedback: [
+        { id: 'SF-00068', enquiryId: 'SE-00008', customer: 'Rajobalan', vehicle: 'R15',     status: 'Draft',     date: '2026-04-10' },
+        { id: 'SF-00067', enquiryId: 'SE-00014', customer: 'Rithwik',   vehicle: 'Fascino', status: 'Submitted', date: '2026-04-11' },
+        { id: 'SF-00066', enquiryId: 'SE-00087', customer: 'Rathish',   vehicle: 'FZ-S',    status: 'Draft',     date: '2026-04-12' },
+        { id: 'SF-00065', enquiryId: 'SE-00066', customer: 'Harishnan', vehicle: 'Fascino', status: 'Draft',     date: '2026-04-12' },
+        { id: 'SF-00064', enquiryId: 'SE-00055', customer: 'Senthoni',  vehicle: 'RayZR',   status: 'Submitted', date: '2026-04-14' },
+        { id: 'SF-00063', enquiryId: 'SE-00043', customer: 'Shanthi',   vehicle: 'RayZR',   status: 'Draft',     date: '2026-04-15' }
+      ]
+    };
+
+    /* ── localStorage helpers ── */
+    const LS_KEY = 'salesCRM_modular';
+    const _load  = key => {
+      try { const v = localStorage.getItem(LS_KEY + '_' + key); return v ? JSON.parse(v) : null; }
+      catch { return null; }
+    };
+    const _save  = (key, data) => {
+      try { localStorage.setItem(LS_KEY + '_' + key, JSON.stringify(data)); }
+      catch { /* storage full — fail silently */ }
+    };
+
+    const Persist = {
+      saveUI() {
+        _save(UI_STATE_STORAGE_KEY, {
+          currentView: appState.currentView,
+          sidebarCollapsed: appState.sidebarCollapsed,
+          search: appState.search,
+          filters: appState.filters
+        });
+      },
+      loadUI() {
+        const saved = _load(UI_STATE_STORAGE_KEY);
+        if (!saved || typeof saved !== 'object') return;
+
+        if (typeof saved.currentView === 'string' && saved.currentView in Views) {
+          appState.currentView = saved.currentView;
+        }
+        if (typeof saved.sidebarCollapsed === 'boolean') {
+          appState.sidebarCollapsed = saved.sidebarCollapsed;
+        }
+        if (typeof saved.search === 'string') {
+          appState.search = saved.search;
+        }
+        if (saved.filters && typeof saved.filters === 'object') {
+          Object.keys(appState.filters).forEach(key => {
+            const src = saved.filters[key];
+            if (!src || typeof src !== 'object') return;
+            appState.filters[key] = {
+              status: typeof src.status === 'string' ? src.status : 'all',
+              vehicle: typeof src.vehicle === 'string' ? src.vehicle : 'all',
+              date: typeof src.date === 'string' ? src.date : 'all'
+            };
+          });
+        }
+      }
+    };
+
+    /* ── Central Store: loads from localStorage, falls back to seed ── */
+    const Store = {
+      enquiries:    _load('enquiries')    || SEED.enquiries,
+      appointments: _load('appointments') || SEED.appointments,
+      feedback:     _load('feedback')     || SEED.feedback,
+
+      addEnquiry(record) {
+        this.enquiries.unshift(record);
+        _save('enquiries', this.enquiries);     /* ← persist immediately */
+      },
+      addAppointment(record) {
+        this.appointments.unshift(record);
+        _save('appointments', this.appointments); /* ← persist immediately */
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       CONFIG: NAVIGATION
+    ═══════════════════════════════════════════════════════════════ */
+    const NAV_CONFIG = [
+      { id: 'dashboard',       label: 'Dashboard',           icon: '⌂', group: 'Workspace' },
+      { id: 'sales-enquiries', label: 'Sales Enquiries',     icon: '▣', group: 'Sales'     },
+      { id: 'enquiry-form',    label: 'Enquiry Form',        icon: '✎', group: 'Sales'     },
+      { id: 'appointments',    label: 'Appointment Booking', icon: '🗓', group: 'Sales'     },
+      { id: 'feedback',        label: 'Sales Feedback',      icon: '☰', group: 'Sales'     }
+    ];
+
+    /* ═══════════════════════════════════════════════════════════════
+       CONFIG: ENQUIRY FORM FIELDS
+    ═══════════════════════════════════════════════════════════════ */
+    const ENQUIRY_FORM_FIELDS = [
+      { section: 'Customer & Enquiry Details' },
+      { label: 'Date',                           name: 'date',                type: 'date'                                                                                      },
+      { label: 'Customer Name',                  name: 'customerName',        type: 'text',     placeholder: 'Enter customer name',          required: true                     },
+      { label: 'Enquiry Type',                   name: 'enquiryType',         type: 'select',   options: ['Direct','Test Ride','Website Lead','Showroom Visit']                  },
+      { label: 'Customer Enquiry Date',          name: 'customerEnquiryDate', type: 'date'                                                                                      },
+      { label: 'Customer Type',                  name: 'customerType',        type: 'select',   options: ['New Customer','Existing Customer','Corporate','Referral']             },
+      { label: 'Test Ride Taken',                name: 'testRide',            type: 'select',   options: ['Yes','No']                                                            },
+      { label: 'Enquiry Source',                 name: 'enquirySource',       type: 'select',   options: ['Walk-in','Phone Call','Website','Referral']                          },
+      { label: 'Gender',                         name: 'gender',              type: 'select',   options: ['Male','Female','Other']                                               },
+      { label: 'Payment Type',                   name: 'paymentType',         type: 'select',   options: ['Cash','Finance','EMI','Undecided'], conditionalTarget: 'financeDetails' },
+      { label: 'Sales Enquiry Status',           name: 'salesEnquiryStatus',  type: 'select',   options: ['Submitted','Draft','Closed']                                         },
+      { label: 'Lead Temperature',               name: 'leadTemperature',     type: 'chips',    options: ['Hot','Warm','Cold'],               hint: 'Prioritize follow-up urgency.' },
+      { label: 'Phone Number',                   name: 'phone',               type: 'tel',      placeholder: '10 digit mobile number',       required: true                     },
+      { label: 'Model Code',                     name: 'modelCode',           type: 'text',     placeholder: 'Example: FA-220'                                                   },
+      { label: 'WhatsApp Number',                name: 'whatsapp',            type: 'tel',      placeholder: 'WhatsApp number'                                                   },
+      { label: 'Model Name',                     name: 'modelName',           type: 'text',     placeholder: 'Selected bike model',          required: true                     },
+      { label: 'Follow Up Date',                 name: 'followUpDate',        type: 'date'                                                                                      },
+      { label: 'Email Address',                  name: 'email',               type: 'email',    placeholder: 'name@example.com'                                                  },
+      { label: 'Source of Information',          name: 'sourceInfo',          type: 'select',   options: ['Newspaper','Instagram','Friend','Dealer Board']                      },
+      { label: 'Customer Interested in Exchange',name: 'exchange',            type: 'select',   options: ['Yes','No','Maybe'],               conditionalTarget: 'exchangeDetails' },
+      { label: 'Remarks',                        name: 'remarks',             type: 'textarea', placeholder: 'Add notes about customer intent', full: true                      },
+
+      { section: 'Address Details' },
+      { label: 'Address 1',  name: 'address1', type: 'text', placeholder: 'Primary address'          },
+      { label: 'Address 4',  name: 'address4', type: 'text', placeholder: 'Landmark / extra details' },
+      { label: 'Address 2',  name: 'address2', type: 'text', placeholder: 'Secondary address'        },
+      { label: 'District',   name: 'district', type: 'text', placeholder: 'District'                 },
+      { label: 'Address 3',  name: 'address3', type: 'text', placeholder: 'Area / locality'          },
+      { label: 'City',       name: 'city',     type: 'text', placeholder: 'City'                     },
+      { label: 'Pincode',    name: 'pincode',  type: 'text', placeholder: 'Pincode'                  },
+      { label: 'State',      name: 'state',    type: 'text', placeholder: 'State'                    }
+    ];
+
+    /* ═══════════════════════════════════════════════════════════════
+       CONFIG: TABLE DEFINITIONS
+    ═══════════════════════════════════════════════════════════════ */
+    const TABLE_CONFIG = {
+      enquiries: {
+        title:      'Enquiry Records',
+        subtitle:   'Reusable table with status, vehicle, and date filters.',
+        tableKey:   'enquiries',
+        searchKeys: ['id','customer','vehicle','source','status','temperature'],
+        addLabel:   'Open Form',
+        addView:    'enquiry-form',
+        columns: [
+          { key: 'id',          label: 'ID'           },
+          { key: 'customer',    label: 'Customer Name'},
+          { key: 'vehicle',     label: 'Vehicle Model'},
+          { key: 'temperature', label: 'Lead Temp',   type: 'badge' },
+          { key: 'status',      label: 'Status',      type: 'badge' },
+          { key: 'date',        label: 'Date'         },
+          { key: 'source',      label: 'Source'       }
+        ]
+      },
+      appointments: {
+        title:      'Appointment Schedule',
+        subtitle:   'Reusable appointment table with the same layout system.',
+        tableKey:   'appointments',
+        searchKeys: ['id','customer','vehicle','status','date'],
+        addLabel:   'New Appointment',
+        addView:    'appointment-form',
+        columns: [
+          { key: 'id',       label: 'Appointment ID'},
+          { key: 'customer', label: 'Customer Name' },
+          { key: 'vehicle',  label: 'Vehicle'       },
+          { key: 'status',   label: 'Status',       type: 'badge' },
+          { key: 'date',     label: 'Date'          },
+          { key: 'time',     label: 'Time'          }
+        ]
+      },
+      feedback: {
+        title:      'Feedback Records',
+        subtitle:   'Reusable feedback table with consistent filtering and status display.',
+        tableKey:   'feedback',
+        searchKeys: ['id','enquiryId','customer','vehicle','status'],
+        columns: [
+          { key: 'id',        label: 'Feedback ID' },
+          { key: 'enquiryId', label: 'Enquiry ID'  },
+          { key: 'customer',  label: 'Customer'    },
+          { key: 'vehicle',   label: 'Vehicle'     },
+          { key: 'status',    label: 'Status',     type: 'badge' },
+          { key: 'date',      label: 'Date'        }
+        ]
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       UTILITIES
+    ═══════════════════════════════════════════════════════════════ */
+    const Utils = {
+      escape(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      },
+      capitalize(value) {
+        return String(value).charAt(0).toUpperCase() + String(value).slice(1);
+      },
+      badgeClass(status) {
+        const key = String(status).toLowerCase();
+        const map = {
+          submitted: 'submitted', closed: 'closed', completed: 'completed',
+          scheduled: 'scheduled', pending: 'pending',
+          hot: 'hot', warm: 'warm', cold: 'cold'
+        };
+        return map[key] || 'draft';
+      },
+      uniqueValues(rows, key) {
+        return [...new Set(rows.map(r => r[key]).filter(Boolean))];
+      },
+      filterRows(rows, config, searchKeys) {
+        const q = appState.search.trim().toLowerCase();
+        return rows.filter(row => {
+          const searchMatch  = !q || searchKeys.some(key => String(row[key] || '').toLowerCase().includes(q));
+          const statusMatch  = config.status  === 'all' || String(row.status  || '').toLowerCase() === config.status;
+          const vehicleMatch = config.vehicle === 'all' || String(row.vehicle || '').toLowerCase() === config.vehicle;
+          const dateMatch    = config.date    === 'all' || String(row.date    || '').startsWith(config.date);
+          return searchMatch && statusMatch && vehicleMatch && dateMatch;
+        });
+      },
+      toast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const el = document.createElement('div');
+        el.className = `toast ${type}`;
+        el.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span> ${Utils.escape(message)}`;
+        container.appendChild(el);
+        setTimeout(() => {
+          el.style.opacity = '0';
+          el.style.transition = 'opacity 0.3s';
+          setTimeout(() => el.remove(), 300);
+        }, 3200);
+      },
+      computeMetrics() {
+        const rows = Store.enquiries;
+        const submitted = rows.filter(r => r.status === 'Submitted').length;
+        const draft     = rows.filter(r => r.status === 'Draft').length;
+        const closed    = rows.filter(r => r.status === 'Closed').length;
+        return [
+          { label: 'Total Enquiries', value: rows.length,              icon: '◎', trend: '+12% vs last week'   },
+          { label: 'Open Pipeline',   value: submitted + draft,         icon: '◔', trend: '8 active follow-ups' },
+          { label: 'Appointments',    value: Store.appointments.length, icon: '◫', trend: '3 this week'         },
+          { label: 'Closed Leads',    value: closed,                    icon: '✓', trend: 'Improving steadily'  }
+        ];
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       COMPONENTS
+    ═══════════════════════════════════════════════════════════════ */
+    const Components = {
+
+      /* ── Sidebar ── */
+      sidebar() {
+        const groups = [...new Set(NAV_CONFIG.map(item => item.group))];
+        const groupHTML = groups.map(group => {
+          const items = NAV_CONFIG.filter(item => item.group === group).map(item => `
+            <div class="nav-link ${appState.currentView === item.id ? 'active' : ''}"
+                 data-nav="${Utils.escape(item.id)}" role="button" tabindex="0">
+              <span class="nav-icon">${item.icon}</span>
+              <span class="nav-text">${Utils.escape(item.label)}</span>
+            </div>
+          `).join('');
+          return `
+            <div>
+              <div class="nav-group-title">${Utils.escape(group)}</div>
+              <div class="nav-menu">${items}</div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="brand">
+            <div class="brand-badge">SC</div>
+            <div class="brand-copy">
+              <h1>Sales Command</h1>
+              <p>Professional CRM Workspace</p>
+            </div>
+          </div>
+          ${groupHTML}
+          <div class="sidebar-footer">
+            <h3>Module Scope</h3>
+            <p>Enquiries · Appointments · Feedback · Modular architecture</p>
+          </div>
+        `;
+      },
+
+      /* ── Topbar ── */
+      topbar() {
+        return `
+          <div class="topbar-left">
+            <button class="icon-btn" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
+            <div class="search-box">
+              <span>⌕</span>
+              <input id="globalSearch" type="text"
+                placeholder="Search customers, vehicles, or records"
+                value="${Utils.escape(appState.search)}" />
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button class="icon-btn" title="Notifications">🔔</button>
+            <button class="icon-btn" title="Help">?</button>
+            <div style="position:relative;">
+              <button class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
+                <div class="avatar">DK</div>
+                <div class="avatar-copy">
+                  <strong>Sales Executive</strong>
+                  <span>CRM Workspace</span>
+                </div>
+              </button>
+              <div class="profile-menu" id="profileMenu" role="menu">
+                <div class="profile-item" role="menuitem">👤 Profile</div>
+                <div class="profile-item" role="menuitem">⚙ Settings</div>
+                <div class="profile-item" role="menuitem">⇥ Sign out</div>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      /* ── Card ── */
+      card({ title, subtitle, content, actionLabel, actionView }) {
+        return `
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3>${Utils.escape(title)}</h3>
+                ${subtitle ? `<p>${Utils.escape(subtitle)}</p>` : ''}
+              </div>
+              ${actionLabel
+                ? `<button class="btn btn-secondary" data-nav="${Utils.escape(actionView || '')}">${Utils.escape(actionLabel)}</button>`
+                : ''}
+            </div>
+            <div class="card-body">${content}</div>
+          </section>
+        `;
+      },
+
+      /* ── Stat Cards ── */
+      statCards() {
+        return `
+          <div class="stats-grid">
+            ${Utils.computeMetrics().map(item => `
+              <section class="card stat-card">
+                <div class="stat-top">
+                  <div>
+                    <small>${Utils.escape(item.label)}</small>
+                    <h3>${item.value}</h3>
+                  </div>
+                  <div class="stat-icon">${item.icon}</div>
+                </div>
+                <div class="trend">${Utils.escape(item.trend)}</div>
+              </section>
+            `).join('')}
+          </div>
+        `;
+      },
+
+      /* ── Table ── */
+      table(cfg, rows) {
+        const { title, subtitle, tableKey, columns, searchKeys, addLabel, addView } = cfg;
+        const config       = appState.filters[tableKey];
+        const filtered     = Utils.filterRows(rows, config, searchKeys);
+        const vehicleOpts  = Utils.uniqueValues(rows, 'vehicle');
+        const monthOpts    = [...new Set(rows.map(r => String(r.date).slice(0, 7)))];
+
+        const statusOptions = [...new Set(rows.map(r => String(r.status).toLowerCase()))];
+
+        const toolbar = `
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <select class="control" data-filter="${tableKey}" data-filter-key="status">
+                <option value="all" ${config.status === 'all' ? 'selected' : ''}>All Status</option>
+                ${statusOptions.map(s =>
+                  `<option value="${s}" ${config.status === s ? 'selected' : ''}>${Utils.capitalize(s)}</option>`
+                ).join('')}
+              </select>
+              <select class="control" data-filter="${tableKey}" data-filter-key="vehicle">
+                <option value="all" ${config.vehicle === 'all' ? 'selected' : ''}>All Vehicles</option>
+                ${vehicleOpts.map(v =>
+                  `<option value="${v.toLowerCase()}" ${config.vehicle === v.toLowerCase() ? 'selected' : ''}>${Utils.escape(v)}</option>`
+                ).join('')}
+              </select>
+              <select class="control" data-filter="${tableKey}" data-filter-key="date">
+                <option value="all" ${config.date === 'all' ? 'selected' : ''}>All Dates</option>
+                ${monthOpts.map(m =>
+                  `<option value="${m}" ${config.date === m ? 'selected' : ''}>${m}</option>`
+                ).join('')}
+              </select>
+            </div>
+            <div class="toolbar-right">
+              ${addLabel
+                ? `<button class="btn btn-primary" data-nav="${Utils.escape(addView || '')}">${Utils.escape(addLabel)}</button>`
+                : ''}
+            </div>
+          </div>
+        `;
+
+        const tableRows = filtered.length
+          ? filtered.map(row => `
+              <tr>
+                ${columns.map(col => {
+                  if (col.type === 'badge') {
+                    const val = row[col.key] || '';
+                    return `<td><span class="badge ${Utils.badgeClass(val)}">${Utils.escape(val)}</span></td>`;
+                  }
+                  return `<td>${Utils.escape(String(row[col.key] ?? '—'))}</td>`;
+                }).join('')}
+              </tr>
+            `).join('')
+          : `<tr><td colspan="${columns.length}" class="empty-state">No matching records found for the current filters.</td></tr>`;
+
+        const content = `
+          ${toolbar}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>${columns.map(col => `<th>${Utils.escape(col.label)}</th>`).join('')}</tr>
+              </thead>
+              <tbody>${tableRows}</tbody>
+            </table>
+          </div>
+        `;
+
+        return Components.card({ title, subtitle, content });
+      },
+
+      /* ── Form Field ── */
+      formField(field) {
+        if (field.section) {
+          return `<div class="form-section"><h4>${Utils.escape(field.section)}</h4></div>`;
+        }
+
+        const cls = field.full ? 'field full' : 'field';
+        const req = field.required ? 'data-required="true"' : '';
+        const errMsg = field.required ? '<span class="error-msg">This field is required.</span>' : '';
+
+        if (field.type === 'select') {
+          const cond = field.conditionalTarget
+            ? `data-conditional="${field.conditionalTarget}"`
+            : '';
+          return `
+            <div class="${cls}">
+              <label>${Utils.escape(field.label)}</label>
+              <select name="${field.name}" ${cond} ${req}>
+                <option value="">Select ${Utils.escape(field.label)}</option>
+                ${field.options.map(o =>
+                  `<option value="${Utils.escape(o)}">${Utils.escape(o)}</option>`
+                ).join('')}
+              </select>
+              ${errMsg}
+            </div>
+          `;
+        }
+
+        if (field.type === 'chips') {
+          return `
+            <div class="${cls}">
+              <label>${Utils.escape(field.label)}</label>
+              <div class="choice-group">
+                ${field.options.map((opt, i) => `
+                  <label class="choice-chip ${opt.toLowerCase()}">
+                    <input type="radio" name="${field.name}" value="${Utils.escape(opt)}" ${i === 0 ? 'checked' : ''}>
+                    <span class="choice-pill">${Utils.escape(opt)}</span>
+                  </label>
+                `).join('')}
+              </div>
+              ${field.hint ? `<div class="field-hint">${Utils.escape(field.hint)}</div>` : ''}
+            </div>
+          `;
+        }
+
+        if (field.type === 'textarea') {
+          return `
+            <div class="${cls}">
+              <label>${Utils.escape(field.label)}</label>
+              <textarea name="${field.name}" placeholder="${Utils.escape(field.placeholder || '')}" ${req}></textarea>
+              ${errMsg}
+            </div>
+          `;
+        }
+
+        return `
+          <div class="${cls}">
+            <label>${Utils.escape(field.label)}</label>
+            <input name="${field.name}" type="${field.type}"
+                   placeholder="${Utils.escape(field.placeholder || '')}" ${req} />
+            ${errMsg}
+          </div>
+        `;
+      },
+
+      /* ── Enquiry Form ── */
+      enquiryForm(fields) {
+        const fieldsHTML = fields.map(f => Components.formField(f)).join('');
+
+        const content = `
+          <div class="helper-note">
+            <span>📋</span>
+            <span>Fill all required fields. Select Payment Type as <strong>Finance</strong> or <strong>EMI</strong> to reveal finance details. Select Exchange as <strong>Yes</strong> or <strong>Maybe</strong> to reveal exchange details.</span>
+          </div>
+          <div style="height:16px;"></div>
+          <form id="salesEnquiryForm" novalidate>
+            <div class="form-grid">
+              ${fieldsHTML}
+
+              <div class="conditional-section" id="financeDetails">
+                <div class="field">
+                  <label>Down Payment (₹)</label>
+                  <input name="downPayment" type="number" placeholder="Planned down payment" />
+                </div>
+                <div class="field">
+                  <label>EMI Amount (₹)</label>
+                  <input name="emi" type="number" placeholder="Expected monthly EMI" />
+                </div>
+                <div class="field">
+                  <label>Tenure (Months)</label>
+                  <input name="tenure" type="number" placeholder="Loan tenure in months" />
+                </div>
+                <div class="field">
+                  <label>Finance Company</label>
+                  <input name="whichFinance" type="text" placeholder="Preferred finance company" />
+                </div>
+              </div>
+
+              <div class="conditional-section" id="exchangeDetails">
+                <div class="field">
+                  <label>Exchange Type</label>
+                  <input name="exchangeType" type="text" placeholder="Scooter / Bike / Car" />
+                </div>
+                <div class="field">
+                  <label>Vehicle Model &amp; Make</label>
+                  <input name="vehicleModelMake" type="text" placeholder="Current vehicle details" />
+                </div>
+                <div class="field">
+                  <label>Year of Manufacturing</label>
+                  <input name="yearOfManufacturing" type="text" placeholder="e.g. 2019" />
+                </div>
+                <div class="field">
+                  <label>Owner Type</label>
+                  <input name="ownerType" type="text" placeholder="First / Second owner" />
+                </div>
+                <div class="field">
+                  <label>Valid Insurance</label>
+                  <select name="validInsurance">
+                    <option value="">Select</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Original RC Available</label>
+                  <select name="originalRcAvailable">
+                    <option value="">Select</option>
+                    <option>Yes</option>
+                    <option>No</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Customer Expected Exchange Price (₹)</label>
+                  <input name="expectedExchangePrice" type="number" placeholder="Customer expectation" />
+                </div>
+                <div class="field">
+                  <label>Price Offer by Dealer (₹)</label>
+                  <input name="dealerOfferPrice" type="number" placeholder="Dealer offer" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn" data-nav="sales-enquiries">Cancel</button>
+              <button type="reset" class="btn btn-secondary">Reset</button>
+              <button type="submit" class="btn btn-primary">Submit Enquiry</button>
+            </div>
+          </form>
+        `;
+
+        return Components.card({
+          title: 'New Sales Enquiry Form',
+          subtitle: 'Capture customer interest, lead temperature, vehicle preference, and contact details.',
+          content
+        });
+      },
+
+      /* ── List Stack ── */
+      listStack(items) {
+        return `
+          <div class="list-stack">
+            ${items.map(item => `
+              <div class="list-item">
+                <div>
+                  <strong>${Utils.escape(item.primary)}</strong>
+                  <span>${Utils.escape(item.secondary)}</span>
+                </div>
+                <span class="badge ${Utils.badgeClass(item.badge)}">${Utils.escape(item.badge)}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       VIEWS
+    ═══════════════════════════════════════════════════════════════ */
+    const Views = {
+
+      dashboard() {
+        const recentItems = Store.enquiries.slice(0, 4).map(item => ({
+          primary:   `${item.customer} · ${item.vehicle}`,
+          secondary: `${item.id} · ${item.source} · ${item.date}`,
+          badge:     item.status
+        }));
+
+        const upcomingItems = Store.appointments
+          .filter(a => a.status === 'Scheduled')
+          .map(item => ({
+            primary:   `${item.customer} · ${item.vehicle}`,
+            secondary: `${item.id} · ${item.date} at ${item.time}`,
+            badge:     item.status
+          }));
+
+        const hot   = Store.enquiries.filter(r => r.temperature === 'Hot').length;
+        const warm  = Store.enquiries.filter(r => r.temperature === 'Warm').length;
+        const cold  = Store.enquiries.filter(r => r.temperature === 'Cold').length;
+        const total = Store.enquiries.length;
+        const hotPct  = Math.round(hot  / total * 100);
+        const warmPct = Math.round(warm / total * 100);
+        const hotDeg  = hotPct * 3.6;
+        const warmDeg = warmPct * 3.6;
+
+        const sources = {};
+        Store.enquiries.forEach(r => { sources[r.source] = (sources[r.source] || 0) + 1; });
+        const sourceItems = Object.entries(sources).map(([src, count]) => ({
+          primary:   src,
+          secondary: `${count} enquiries`,
+          badge:     `${Math.round(count / total * 100)}%`
+        }));
+
+        const leadDistContent = `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+            <div style="width:180px;height:180px;border-radius:50%;background:conic-gradient(#dc2626 0deg ${hotDeg}deg,#ea580c ${hotDeg}deg ${hotDeg+warmDeg}deg,#2563eb ${hotDeg+warmDeg}deg 360deg);display:flex;align-items:center;justify-content:center;">
+              <div style="width:120px;height:120px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;font-weight:700;">
+                <div style="font-size:22px;">${total}</div>
+                <div style="font-size:11px;color:#64748b;">TOTAL LEADS</div>
+              </div>
+            </div>
+            <div style="width:100%;max-width:220px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#dc2626;">🔴 Hot</span><span>${hot} (${hotPct}%)</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#ea580c;">🟠 Warm</span><span>${warm} (${Math.round(warm/total*100)}%)</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:#2563eb;">🔵 Cold</span><span>${cold} (${Math.round(cold/total*100)}%)</span></div>
+            </div>
+          </div>
+        `;
+
+        const sourceContent = Components.listStack(sourceItems);
+
+        return `
+          <section class="page-header">
+            <div class="page-title">
+              <h2>Sales CRM Dashboard</h2>
+              <p>Overview of your enquiries, appointments, and sales pipeline. All components are fully reusable and dynamically rendered.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-secondary" data-nav="sales-enquiries">View Enquiries</button>
+              <button class="btn btn-primary" data-nav="enquiry-form">Add New Enquiry</button>
+            </div>
+          </section>
+          ${Components.statCards()}
+          <section class="split-grid">
+            ${Components.card({ title: 'Recent Enquiries', subtitle: 'Latest sales activity in the pipeline', content: Components.listStack(recentItems), actionLabel: 'Open Enquiries', actionView: 'sales-enquiries' })}
+            ${Components.card({ title: 'Upcoming Appointments', subtitle: 'Scheduled customer visits', content: Components.listStack(upcomingItems), actionLabel: 'All Appointments', actionView: 'appointments' })}
+          </section>
+          <section class="split-grid">
+            ${Components.card({ title: 'Lead Distribution', subtitle: 'Temperature breakdown across pipeline', content: leadDistContent })}
+            ${Components.card({ title: 'Enquiry Sources', subtitle: 'Where customers are coming from', content: sourceContent })}
+          </section>
+        `;
+      },
+
+      'sales-enquiries'() {
+        return `
+          <section class="page-header">
+            <div class="page-title">
+              <h2>Sales Enquiries</h2>
+              <p>All customer enquiries with status, lead temperature, and vehicle details. Filter by status, vehicle, or date.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-primary" data-nav="enquiry-form">Add Enquiry</button>
+            </div>
+          </section>
+          ${Components.table(TABLE_CONFIG.enquiries, Store.enquiries)}
+        `;
+      },
+
+      appointments() {
+        return `
+          <section class="page-header">
+            <div class="page-title">
+              <h2>Appointment Booking</h2>
+              <p>Track scheduled, pending, and completed customer appointments. Manage follow-up timing after enquiry capture.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn btn-primary" data-nav="appointment-form">Add Appointment</button>
+            </div>
+          </section>
+          ${Components.table(TABLE_CONFIG.appointments, Store.appointments)}
+        `;
+      },
+
+      feedback() {
+        return `
+          <section class="page-header">
+            <div class="page-title">
+              <h2>Sales Feedback</h2>
+              <p>Outcome records from customer appointments and discussions. Track submitted vs draft feedback entries.</p>
+            </div>
+          </section>
+          ${Components.table(TABLE_CONFIG.feedback, Store.feedback)}
+        `;
+      },
+
+      'enquiry-form'() {
+        return `
+          <section class="page-header">
+            <div class="page-title">
+              <h2>Enquiry Form</h2>
+              <p>Capture complete customer details including contact information, vehicle interest, lead temperature, payment type, and address.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn" data-nav="sales-enquiries">← Back to List</button>
+            </div>
+          </section>
+          ${Components.enquiryForm(ENQUIRY_FORM_FIELDS)}
+        `;
+      },
+
+      'appointment-form'() {
+        return `
+          <section class="page-header">
+            <div class="page-title">
+              <h2>New Appointment</h2>
+              <p>Schedule a new customer appointment by filling in the details below.</p>
+            </div>
+            <div class="page-actions">
+              <button class="btn" data-nav="appointments">← Back to List</button>
+            </div>
+          </section>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3>Appointment Details</h3>
+                <p>Fill in all required fields to book the appointment.</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <form id="appointmentForm" novalidate>
+                <div class="form-grid">
+                  <div class="field">
+                    <label>Customer Name</label>
+                    <input type="text" name="apptCustomer" placeholder="Enter customer name" data-required="true" />
+                    <span class="error-msg">This field is required.</span>
+                  </div>
+                  <div class="field">
+                    <label>Vehicle</label>
+                    <input type="text" name="apptVehicle" placeholder="e.g. Fascino, FZ-S, R15" data-required="true" />
+                    <span class="error-msg">This field is required.</span>
+                  </div>
+                  <div class="field">
+                    <label>Date</label>
+                    <input type="date" name="apptDate" data-required="true" />
+                    <span class="error-msg">This field is required.</span>
+                  </div>
+                  <div class="field">
+                    <label>Time</label>
+                    <input type="time" name="apptTime" data-required="true" />
+                    <span class="error-msg">This field is required.</span>
+                  </div>
+                  <div class="field">
+                    <label>Status</label>
+                    <select name="apptStatus">
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="reset" class="btn btn-secondary">Reset</button>
+                  <button type="submit" class="btn btn-primary">Book Appointment</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       ROUTER
+    ═══════════════════════════════════════════════════════════════ */
+    const Router = {
+      navigate(viewId) {
+        appState.currentView = viewId;
+        if (window.innerWidth <= 900) {
+          appState.mobileSidebarOpen = false;
+          Shell.sync();
+        }
+        Persist.saveUI();
+        Renderer.page();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       SHELL
+    ═══════════════════════════════════════════════════════════════ */
+    const Shell = {
+      sync() {
+        const shell = document.getElementById('appShell');
+        shell.classList.toggle('sidebar-collapsed',   appState.sidebarCollapsed   && window.innerWidth > 900);
+        shell.classList.toggle('mobile-sidebar-open', appState.mobileSidebarOpen  && window.innerWidth <= 900);
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       RENDERER
+    ═══════════════════════════════════════════════════════════════ */
+    const Renderer = {
+      sidebar() {
+        document.getElementById('sidebar').innerHTML = Components.sidebar();
+        document.querySelectorAll('[data-nav]').forEach(el => {
+          const view = el.dataset.nav;
+          if (!view) return;
+          const handler = () => Router.navigate(view);
+          el.addEventListener('click', handler);
+          el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') handler(); });
+        });
+      },
+
+      topbar() {
+        document.getElementById('topbar').innerHTML = Components.topbar();
+
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+          if (window.innerWidth <= 900) {
+            appState.mobileSidebarOpen = !appState.mobileSidebarOpen;
+          } else {
+            appState.sidebarCollapsed = !appState.sidebarCollapsed;
+          }
+          Shell.sync();
+          Persist.saveUI();
+        });
+
+        document.getElementById('globalSearch').addEventListener('input', e => {
+          appState.search = e.target.value;
+          Persist.saveUI();
+          Renderer.pageContent();
+        });
+
+        const avatarBtn   = document.getElementById('avatarBtn');
+        const profileMenu = document.getElementById('profileMenu');
+        avatarBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          const isOpen = profileMenu.classList.toggle('open');
+          avatarBtn.setAttribute('aria-expanded', isOpen);
+        });
+        document.addEventListener('click', () => {
+          profileMenu.classList.remove('open');
+          avatarBtn.setAttribute('aria-expanded', 'false');
+        });
+      },
+
+      pageContent() {
+        const root   = document.getElementById('pageRoot');
+        const viewFn = Views[appState.currentView] || Views.dashboard;
+        root.innerHTML = viewFn.call(Views);
+        Renderer.bindPageEvents();
+      },
+
+      page(rerenderTopbar = true) {
+        this.pageContent();
+        if (rerenderTopbar) this.topbar();
+        this.sidebar();
+      },
+
+      bindPageEvents() {
+        /* data-nav on any element navigates to the target view */
+        document.querySelectorAll('[data-nav]').forEach(el => {
+          if (el.closest('.sidebar')) return; // sidebar handles its own
+          const view = el.dataset.nav;
+          if (!view) return;
+          el.addEventListener('click', () => Router.navigate(view));
+        });
+
+        /* Table filter dropdowns */
+        document.querySelectorAll('[data-filter]').forEach(control => {
+          control.addEventListener('change', () => {
+            const tableKey  = control.dataset.filter;
+            const filterKey = control.dataset.filterKey;
+            if (appState.filters[tableKey]) {
+              appState.filters[tableKey][filterKey] = control.value;
+            }
+            Persist.saveUI();
+            Renderer.pageContent();
+            Renderer.sidebar(); // keep active state
+          });
+        });
+
+        /* Form behaviour */
+        this.bindForm();
+      },
+
+      bindForm() {
+        const form = document.getElementById('salesEnquiryForm');
+
+        /* ── Appointment Form ── */
+        const apptForm = document.getElementById('appointmentForm');
+        if (apptForm) {
+          const apptValidate = () => {
+            let valid = true;
+            apptForm.querySelectorAll('[data-required="true"]').forEach(el => {
+              const empty  = !el.value.trim();
+              const parent = el.closest('.field');
+              if (parent) parent.classList.toggle('has-error', empty);
+              el.classList.toggle('error', empty);
+              if (empty) valid = false;
+            });
+            return valid;
+          };
+
+          apptForm.querySelectorAll('[data-required="true"]').forEach(el => {
+            el.addEventListener('input', () => {
+              if (el.value.trim()) {
+                const parent = el.closest('.field');
+                if (parent) parent.classList.remove('has-error');
+                el.classList.remove('error');
+              }
+            });
+          });
+
+          apptForm.addEventListener('submit', e => {
+            e.preventDefault();
+            if (!apptValidate()) {
+              Utils.toast('Please fill all required fields.', 'error');
+              return;
+            }
+            const get = name => apptForm.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+            const rawTime = get('apptTime');
+            const [h, m] = rawTime.split(':').map(Number);
+            const suffix = h >= 12 ? 'PM' : 'AM';
+            const hour12 = ((h % 12) || 12);
+            const formattedTime = `${String(hour12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${suffix}`;
+            const newAppt = {
+              id:       `SABP-${String(Math.floor(1000 + Math.random() * 9000))}`,
+              customer: get('apptCustomer'),
+              vehicle:  get('apptVehicle'),
+              date:     get('apptDate'),
+              time:     formattedTime,
+              status:   get('apptStatus') || 'Scheduled'
+            };
+            Store.addAppointment(newAppt);
+            Utils.toast(`Appointment booked for ${newAppt.customer} on ${newAppt.date} at ${newAppt.time}.`, 'success');
+            Router.navigate('appointments');
+          });
+        }
+
+        if (!form) return;
+
+        /* Conditional field visibility */
+        const conditionalMap = {
+          financeDetails:  (val) => val === 'finance' || val === 'emi',
+          exchangeDetails: (val) => val === 'yes' || val === 'maybe'
+        };
+
+        form.querySelectorAll('[data-conditional]').forEach(select => {
+          const targetId = select.dataset.conditional;
+          const target   = document.getElementById(targetId);
+          const test     = conditionalMap[targetId] || (() => false);
+
+          const toggle = () => {
+            if (target) target.classList.toggle('show', test((select.value || '').toLowerCase()));
+          };
+          select.addEventListener('change', toggle);
+          toggle();
+        });
+
+        /* Inline validation */
+        const validate = () => {
+          let valid = true;
+          form.querySelectorAll('[data-required="true"]').forEach(el => {
+            const empty  = !el.value.trim();
+            const parent = el.closest('.field');
+            if (parent) parent.classList.toggle('has-error', empty);
+            el.classList.toggle('error', empty);
+            if (empty) valid = false;
+          });
+          return valid;
+        };
+
+        form.querySelectorAll('[data-required="true"]').forEach(el => {
+          el.addEventListener('input', () => {
+            if (el.value.trim()) {
+              const parent = el.closest('.field');
+              if (parent) parent.classList.remove('has-error');
+              el.classList.remove('error');
+            }
+          });
+        });
+
+        /* Submit */
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+          if (!validate()) {
+            Utils.toast('Please fill all required fields.', 'error');
+            return;
+          }
+
+          const get        = name => form.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+          const getChecked = name => form.querySelector(`[name="${name}"]:checked`)?.value  || 'Hot';
+
+          const id              = `SE-${String(Date.now()).slice(-5)}`;
+          const customerName    = get('customerName');
+          const vehicle         = get('modelName');
+          const status          = get('salesEnquiryStatus') || 'Submitted';
+          const leadTemperature = getChecked('leadTemperature');
+          const date            = new Date().toISOString().slice(0, 10);
+          const phone           = get('phone');
+          const address = {
+            address1: get('address1'),
+            address2: get('address2'),
+            address3: get('address3'),
+            address4: get('address4'),
+            city: get('city'),
+            district: get('district'),
+            state: get('state'),
+            pincode: get('pincode')
+          };
+
+          Store.addEnquiry({
+            id,
+            customer:    customerName  || 'Customer',
+            vehicle:     vehicle       || 'Selected model',
+            phone,
+            address,
+            temperature: leadTemperature,
+            status,
+            date,
+            source:      get('enquirySource') || 'Walk-in'
+          });
+
+          Utils.toast(`Enquiry for ${customerName || 'Customer'} submitted. Lead: ${leadTemperature} | ${vehicle}`, 'success');
+          Router.navigate('sales-enquiries');
+        });
+
+        /* Reset */
+        form.addEventListener('reset', () => {
+          setTimeout(() => {
+            form.querySelectorAll('.conditional-section').forEach(el => el.classList.remove('show'));
+            form.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+            form.querySelectorAll('.field').forEach(f => f.classList.remove('has-error'));
+          }, 10);
+        });
+      }
+    };
+
+    /* ═══════════════════════════════════════════════════════════════
+       INIT
+    ═══════════════════════════════════════════════════════════════ */
+    function init() {
+      Persist.loadUI();
+      Renderer.topbar();
+      Renderer.pageContent();
+      Renderer.sidebar();
+      Shell.sync();
+      window.addEventListener('resize', Shell.sync.bind(Shell));
+    }
+
+    init();
+  </script>
+
+
+</body></html>
