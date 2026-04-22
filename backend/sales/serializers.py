@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Enquiry, Customer, Appointment, Feedback
 
+
 class EnquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = Enquiry
