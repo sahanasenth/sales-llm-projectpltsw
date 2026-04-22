@@ -613,33 +613,59 @@
 
   <script>
     const API_BASE = 'http://127.0.0.1:8000/api';
-const Api = {
-  async getEnquiries() {
-    const response = await fetch(`${API_BASE}/enquiry/`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch enquiries');
-    }
-    return response.json();
-  },
 
-  async createEnquiry(payload) {
-    const response = await fetch(`${API_BASE}/enquiry/create/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+    const Api = {
+      async getEnquiries() {
+        const response = await fetch(`${API_BASE}/enquiry/`);
+        if (!response.ok) throw new Error('Failed to fetch enquiries');
+        return response.json();
       },
-      body: JSON.stringify(payload)
-    });
 
-    const data = await response.json();
+      async createEnquiry(payload) {
+        const response = await fetch(`${API_BASE}/enquiry/create/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(JSON.stringify(data));
+        return data;
+      },
 
-    if (!response.ok) {
-      throw new Error(JSON.stringify(data));
-    }
+      async getAppointments() {
+        const response = await fetch(`${API_BASE}/appointment/`);
+        if (!response.ok) throw new Error('Failed to fetch appointments');
+        return response.json();
+      },
 
-    return data;
-  }
-};
+      async createAppointment(payload) {
+        const response = await fetch(`${API_BASE}/appointment/create/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(JSON.stringify(data));
+        return data;
+      },
+
+      async getFeedback() {
+        const response = await fetch(`${API_BASE}/feedback/`);
+        if (!response.ok) throw new Error('Failed to fetch feedback');
+        return response.json();
+      },
+
+      async createFeedback(payload) {
+        const response = await fetch(`${API_BASE}/feedback/create/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(JSON.stringify(data));
+        return data;
+      }
+    };
     
     /* ═══════════════════════════════════════════════════════════════
        STATE
@@ -741,25 +767,36 @@ const Api = {
       }
     };
 
-    /* ── Central Store: enquiries from API, others from localStorage ── */
-  const Store = {
-  enquiries: [],
-  appointments: _load('appointments') || SEED.appointments,
-  feedback: _load('feedback') || SEED.feedback,
+    /* ── Central Store: all data from API ── */
+    const Store = {
+      enquiries: [],
+      appointments: [],
+      feedback: [],
 
-  setEnquiries(records) {
-    this.enquiries = records;
-  },
+      setEnquiries(records) {
+        this.enquiries = records;
+      },
 
-  addEnquiry(record) {
-    this.enquiries.unshift(record);
-  },
+      addEnquiry(record) {
+        this.enquiries.unshift(record);
+      },
 
-  addAppointment(record) {
-    this.appointments.unshift(record);
-    _save('appointments', this.appointments);
-  }
-};
+      setAppointments(records) {
+        this.appointments = records;
+      },
+
+      addAppointment(record) {
+        this.appointments.unshift(record);
+      },
+
+      setFeedback(records) {
+        this.feedback = records;
+      },
+
+      addFeedback(record) {
+        this.feedback.unshift(record);
+      }
+    };
 
     /* ═══════════════════════════════════════════════════════════════
        CONFIG: NAVIGATION
@@ -1621,29 +1658,54 @@ const Api = {
             });
           });
 
-          apptForm.addEventListener('submit', e => {
+          apptForm.addEventListener('submit', async e => {
             e.preventDefault();
+
             if (!apptValidate()) {
               Utils.toast('Please fill all required fields.', 'error');
               return;
             }
+
             const get = name => apptForm.querySelector(`[name="${name}"]`)?.value?.trim() || '';
             const rawTime = get('apptTime');
             const [h, m] = rawTime.split(':').map(Number);
             const suffix = h >= 12 ? 'PM' : 'AM';
             const hour12 = ((h % 12) || 12);
             const formattedTime = `${String(hour12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${suffix}`;
-            const newAppt = {
-              id:       `SABP-${String(Math.floor(1000 + Math.random() * 9000))}`,
+
+            const payload = {
+              id: `SABP-${Date.now()}`,
               customer: get('apptCustomer'),
-              vehicle:  get('apptVehicle'),
-              date:     get('apptDate'),
-              time:     formattedTime,
-              status:   get('apptStatus') || 'Scheduled'
+              vehicle: get('apptVehicle'),
+              date: get('apptDate'),
+              time: formattedTime,
+              status: get('apptStatus') || 'Scheduled'
             };
-            Store.addAppointment(newAppt);
-            Utils.toast(`Appointment booked for ${newAppt.customer} on ${newAppt.date} at ${newAppt.time}.`, 'success');
-            Router.navigate('appointments');
+
+            try {
+              const saved = await Api.createAppointment(payload);
+
+              const mapped = {
+                id: saved.appointment_id,
+                customer: saved.customer,
+                vehicle: saved.vehicle,
+                date: saved.date,
+                time: saved.time,
+                status: saved.status
+              };
+
+              Store.addAppointment(mapped);
+
+              Utils.toast(
+                `Appointment booked for ${mapped.customer} on ${mapped.date} at ${mapped.time}.`,
+                'success'
+              );
+
+              Router.navigate('appointments');
+            } catch (error) {
+              console.error('Create appointment failed:', error);
+              Utils.toast('Failed to save appointment to server.', 'error');
+            }
           });
         }
 
@@ -1773,12 +1835,54 @@ async function loadEnquiriesFromApi() {
   }
 }
 
+    async function loadAppointmentsFromApi() {
+      try {
+        const data = await Api.getAppointments();
+
+        const mapped = data.map(item => ({
+          id: item.appointment_id,
+          customer: item.customer,
+          vehicle: item.vehicle,
+          status: item.status,
+          date: item.date,
+          time: item.time
+        }));
+
+        Store.setAppointments(mapped);
+      } catch (error) {
+        console.error('Error loading appointments:', error);
+        Store.setAppointments([]);
+      }
+    }
+
+    async function loadFeedbackFromApi() {
+      try {
+        const data = await Api.getFeedback();
+
+        const mapped = data.map(item => ({
+          id: item.feedback_id,
+          enquiryId: item.enquiry_id,
+          customer: item.customer,
+          vehicle: item.vehicle,
+          status: item.status,
+          date: item.date
+        }));
+
+        Store.setFeedback(mapped);
+      } catch (error) {
+        console.error('Error loading feedback:', error);
+        Store.setFeedback([]);
+      }
+    }
+
     /* ═══════════════════════════════════════════════════════════════
        INIT
     ═══════════════════════════════════════════════════════════════ */
   async function init() {
   Persist.loadUI();
-  await loadEnquiriesFromApi();   // ⭐ THIS LINE IS CRITICAL
+  await loadEnquiriesFromApi();
+  await loadAppointmentsFromApi();
+  await loadFeedbackFromApi();
   Renderer.topbar();
   Renderer.pageContent();
   Renderer.sidebar();
