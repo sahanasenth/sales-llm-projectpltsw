@@ -612,6 +612,35 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
+    const API_BASE = 'http://127.0.0.1:8000/api';
+const Api = {
+  async getEnquiries() {
+    const response = await fetch(`${API_BASE}/enquiry/`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch enquiries');
+    }
+    return response.json();
+  },
+
+  async createEnquiry(payload) {
+    const response = await fetch(`${API_BASE}/enquiry/create/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(JSON.stringify(data));
+    }
+
+    return data;
+  }
+};
+    
     /* ═══════════════════════════════════════════════════════════════
        STATE
     ═══════════════════════════════════════════════════════════════ */
@@ -712,21 +741,25 @@
       }
     };
 
-    /* ── Central Store: loads from localStorage, falls back to seed ── */
-    const Store = {
-      enquiries:    _load('enquiries')    || SEED.enquiries,
-      appointments: _load('appointments') || SEED.appointments,
-      feedback:     _load('feedback')     || SEED.feedback,
+    /* ── Central Store: enquiries from API, others from localStorage ── */
+  const Store = {
+  enquiries: [],
+  appointments: _load('appointments') || SEED.appointments,
+  feedback: _load('feedback') || SEED.feedback,
 
-      addEnquiry(record) {
-        this.enquiries.unshift(record);
-        _save('enquiries', this.enquiries);     /* ← persist immediately */
-      },
-      addAppointment(record) {
-        this.appointments.unshift(record);
-        _save('appointments', this.appointments); /* ← persist immediately */
-      }
-    };
+  setEnquiries(records) {
+    this.enquiries = records;
+  },
+
+  addEnquiry(record) {
+    this.enquiries.unshift(record);
+  },
+
+  addAppointment(record) {
+    this.appointments.unshift(record);
+    _save('appointments', this.appointments);
+  }
+};
 
     /* ═══════════════════════════════════════════════════════════════
        CONFIG: NAVIGATION
@@ -828,6 +861,7 @@
         ]
       }
     };
+    
 
     /* ═══════════════════════════════════════════════════════════════
        UTILITIES
@@ -891,6 +925,8 @@
         ];
       }
     };
+
+  
 
     /* ═══════════════════════════════════════════════════════════════
        COMPONENTS
@@ -1655,48 +1691,52 @@
         });
 
         /* Submit */
-        form.addEventListener('submit', e => {
+        form.addEventListener('submit', async e => {
           e.preventDefault();
+
           if (!validate()) {
             Utils.toast('Please fill all required fields.', 'error');
             return;
           }
 
-          const get        = name => form.querySelector(`[name="${name}"]`)?.value?.trim() || '';
-          const getChecked = name => form.querySelector(`[name="${name}"]:checked`)?.value  || 'Hot';
+          const get = name => form.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+          const getChecked = name => form.querySelector(`[name="${name}"]:checked`)?.value || 'Hot';
 
-          const id              = `SE-${String(Date.now()).slice(-5)}`;
-          const customerName    = get('customerName');
-          const vehicle         = get('modelName');
-          const status          = get('salesEnquiryStatus') || 'Submitted';
-          const leadTemperature = getChecked('leadTemperature');
-          const date            = new Date().toISOString().slice(0, 10);
-          const phone           = get('phone');
-          const address = {
-            address1: get('address1'),
-            address2: get('address2'),
-            address3: get('address3'),
-            address4: get('address4'),
-            city: get('city'),
-            district: get('district'),
-            state: get('state'),
-            pincode: get('pincode')
+          const payload = {
+            id: `SE-${String(Date.now()).slice(-5)}`,
+            customer: get('customerName') || 'Customer',
+            vehicle: get('modelName') || 'Selected model',
+            temperature: getChecked('leadTemperature'),
+            status: get('salesEnquiryStatus') || 'Submitted',
+            date: new Date().toISOString().slice(0, 10),
+            source: get('enquirySource') || 'Walk-in'
           };
 
-          Store.addEnquiry({
-            id,
-            customer:    customerName  || 'Customer',
-            vehicle:     vehicle       || 'Selected model',
-            phone,
-            address,
-            temperature: leadTemperature,
-            status,
-            date,
-            source:      get('enquirySource') || 'Walk-in'
-          });
+          try {
+            const saved = await Api.createEnquiry(payload);
 
-          Utils.toast(`Enquiry for ${customerName || 'Customer'} submitted. Lead: ${leadTemperature} | ${vehicle}`, 'success');
-          Router.navigate('sales-enquiries');
+            const mapped = {
+              id: saved.enquiry_id,
+              customer: saved.customer,
+              vehicle: saved.vehicle,
+              temperature: saved.temperature,
+              status: saved.status,
+              date: saved.date,
+              source: saved.source
+            };
+
+            Store.addEnquiry(mapped);
+
+            Utils.toast(
+              `Enquiry for ${mapped.customer} submitted. Lead: ${mapped.temperature} | ${mapped.vehicle}`,
+              'success'
+            );
+
+            Router.navigate('sales-enquiries');
+          } catch (error) {
+            console.error('Create enquiry failed:', error);
+            Utils.toast('Failed to save enquiry to server.', 'error');
+          }
         });
 
         /* Reset */
@@ -1710,19 +1750,43 @@
       }
     };
 
+init();
+async function loadEnquiriesFromApi() {
+  try {
+    const response = await fetch('http://127.0.0.1:8000/api/enquiry/');
+    const data = await response.json();
+
+    const mapped = data.map(item => ({
+      id: item.enquiry_id,
+      customer: item.customer,
+      vehicle: item.vehicle,
+      temperature: item.temperature,
+      status: item.status,
+      date: item.date,
+      source: item.source
+    }));
+
+    Store.setEnquiries(mapped);
+  } catch (error) {
+    console.error('Error loading enquiries:', error);
+    Store.setEnquiries([]);
+  }
+}
+
     /* ═══════════════════════════════════════════════════════════════
        INIT
     ═══════════════════════════════════════════════════════════════ */
-    function init() {
-      Persist.loadUI();
-      Renderer.topbar();
-      Renderer.pageContent();
-      Renderer.sidebar();
-      Shell.sync();
-      window.addEventListener('resize', Shell.sync.bind(Shell));
-    }
+  async function init() {
+  Persist.loadUI();
+  await loadEnquiriesFromApi();   // ⭐ THIS LINE IS CRITICAL
+  Renderer.topbar();
+  Renderer.pageContent();
+  Renderer.sidebar();
+  Shell.sync();
+  window.addEventListener('resize', Shell.sync.bind(Shell));
+}
+init();
 
-    init();
   </script>
 
 
