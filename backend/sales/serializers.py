@@ -1,15 +1,10 @@
 from rest_framework import serializers
-from .models import Enquiry, Customer, Appointment, Feedback
+from .models import Enquiry, Appointment, Feedback
 
 
 class EnquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = Enquiry
-        fields = '__all__'
-
-class CustomerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Customer
         fields = '__all__'
 
 class AppointmentSerializer(serializers.ModelSerializer):
