@@ -1,25 +1,3 @@
-# from django.urls import path, include
-# from rest_framework.routers import DefaultRouter
-# from .views import EnquiryViewSet, CustomerViewSet, AppointmentViewSet, FeedbackViewSet
-
-# router = DefaultRouter()
-# router.register(r'enquiry', EnquiryViewSet)
-# router.register(r'customer', CustomerViewSet)
-# router.register(r'appointment', AppointmentViewSet)
-# router.register(r'feedback', FeedbackViewSet)
-
-# urlpatterns = [
-#     path('', include(router.urls)),
-# ]
-
-# from django.urls import path
-# from .views import get_enquiries, create_enquiry
-
-# urlpatterns = [
-#     path('enquiry/', get_enquiries),
-#     path('enquiry/create/', create_enquiry),
-# ]
-
 from django.urls import path
 from .views import (
     get_enquiries,
@@ -28,6 +6,7 @@ from .views import (
     create_appointment,
     get_feedback,
     create_feedback,
+    chat_api
 )
 
 urlpatterns = [
@@ -39,9 +18,6 @@ urlpatterns = [
 
     path('feedback/', get_feedback, name='get_feedback'),
     path('feedback/create/', create_feedback, name='create_feedback'),
+
+    path('chat/', chat_api, name='chat_api'),
 ]
-
-
-
-
-
