@@ -1,11 +1,3 @@
-# =============================================================
-#  authentication/apps.py
-#  AppConfig for the 'authentication' Django application.
-#
-#  Django uses AppConfig classes to store metadata about an app
-#  and to hook into application-ready signals.
-# =============================================================
-
 from django.apps import AppConfig
 
 
