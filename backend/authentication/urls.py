@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import LoginView, LogoutView, RegisterView, ProfileView
+from .views import LoginView, LogoutView, RegisterView, ProfileView, RoleAssignmentView
 
 # ─────────────────────────────────────────────────────────────
 #  URL map (all prefixed with /api/ in sales_project/urls.py)
@@ -35,4 +35,7 @@ urlpatterns = [
 
     # View or update the authenticated user's profile
     path('profile/', ProfileView.as_view(), name='profile'),
+
+    # Director-only role assignment
+    path('users/<int:user_id>/role/', RoleAssignmentView.as_view(), name='assign_role'),
 ]

@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+User = get_user_model()
 
 
 # ─────────────────────────────────────────────────────────────
@@ -77,6 +79,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     Serializes the authenticated user's profile data.
     Only exposes safe, non-sensitive fields — never the password hash.
     """
+    role_code = serializers.CharField(read_only=True)
+    role_label = serializers.CharField(read_only=True)
+    permissions = serializers.ListField(child=serializers.CharField(), read_only=True)
 
     class Meta:
         model = User
@@ -86,6 +91,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'email',
             'first_name',
             'last_name',
+            'role',
+            'role_code',
+            'role_label',
+            'permissions',
             'is_staff',
             'date_joined',
             'last_login',
@@ -145,3 +154,16 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
         )
         return user
+
+
+class RoleAssignmentSerializer(serializers.Serializer):
+    """
+    Validates role changes made by privileged users.
+    """
+
+    role = serializers.ChoiceField(choices=User.Role.choices)
+
+    def update(self, instance, validated_data):
+        instance.role = validated_data['role']
+        instance.save(update_fields=['role'])
+        return instance

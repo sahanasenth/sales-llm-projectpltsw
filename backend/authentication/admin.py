@@ -1,9 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import User
 
-# Unregister the default User registration so we can customise it
-admin.site.unregister(User)
+from .models import User
 
 
 @admin.register(User)
@@ -23,12 +21,19 @@ class CustomUserAdmin(UserAdmin):
         'email',
         'first_name',
         'last_name',
+        'role',
         'is_active',
         'is_staff',
         'date_joined',
     ]
 
-    list_filter = ['is_active', 'is_staff', 'is_superuser', 'date_joined']
+    list_filter = ['role', 'is_active', 'is_staff', 'is_superuser', 'date_joined']
     search_fields = ['username', 'email', 'first_name', 'last_name']
     ordering = ['-date_joined']
     readonly_fields = ['date_joined', 'last_login']
+    fieldsets = UserAdmin.fieldsets + (
+        ('Role', {'fields': ('role',)}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Role', {'fields': ('role',)}),
+    )

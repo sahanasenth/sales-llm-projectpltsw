@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,36 +6,51 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework_simplejwt.exceptions import TokenError
 
-from .serializers import LoginSerializer, UserProfileSerializer, RegisterSerializer
+from .permissions import IsDirector
+from .serializers import (
+    LoginSerializer,
+    RegisterSerializer,
+    RoleAssignmentSerializer,
+    UserProfileSerializer,
+)
+
+User = get_user_model()
 
 
-# ─────────────────────────────────────────────────────────────
-#  Helper: generate_tokens_for_user()
-#  Creates a JWT token pair for any given user.
-# ─────────────────────────────────────────────────────────────
+def get_role_identity(user):
+    return {
+        'code': user.role_code,
+        'label': user.role_label,
+        'permissions': user.permissions,
+    }
+
+
+def get_auth_identity(user):
+    role_identity = get_role_identity(user)
+    return {
+        'authenticated': True,
+        'role': role_identity,
+        'permissions': role_identity['permissions'],
+    }
+
+
 def generate_tokens_for_user(user):
     """
     Generate a new JWT access + refresh token pair for the given user.
-
-    RefreshToken.for_user(user) is a SimpleJWT method that:
-      1. Creates a new RefreshToken linked to this user
-      2. Embeds user_id into the token payload
-      3. Signs it with the SECRET_KEY using HS256
     """
     refresh = RefreshToken.for_user(user)
+    refresh['role'] = user.role_code
+    refresh['role_label'] = user.role_label
+    refresh['permissions'] = user.permissions
+
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
 
 
-# ─────────────────────────────────────────────────────────────
-#  LoginView  — POST /api/token/
-#  Permission: AllowAny (this IS the login endpoint)
-# ─────────────────────────────────────────────────────────────
 class LoginView(APIView):
     """
     Authenticates a user and returns JWT access + refresh tokens.
@@ -50,14 +65,14 @@ class LoginView(APIView):
                 {
                     "success": False,
                     "message": "Login failed. Please check your credentials.",
-                    "errors": serializer.errors
+                    "errors": serializer.errors,
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         user = serializer.validated_data['user']
         tokens = generate_tokens_for_user(user)
-        user_data = UserProfileSerializer(user).data
+        auth_identity = get_auth_identity(user)
 
         return Response(
             {
@@ -67,24 +82,18 @@ class LoginView(APIView):
                     "access": tokens['access'],
                     "refresh": tokens['refresh'],
                 },
-                "user": user_data
+                "auth": auth_identity,
+                "role": auth_identity['role'],
+                "permissions": auth_identity['permissions'],
+                "user": UserProfileSerializer(user).data,
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
 
-# ─────────────────────────────────────────────────────────────
-#  LogoutView  — POST /api/logout/
-#  Permission: IsAuthenticated (must send valid access token)
-#
-#  Blacklists the refresh token so it can no longer be used
-#  to generate new access tokens (server-side logout).
-# ─────────────────────────────────────────────────────────────
 class LogoutView(APIView):
     """
     Logs out the user by blacklisting their refresh token.
-    Requires: Authorization: Bearer <access_token>
-    Body:      { "refresh": "<refresh_token>" }
     """
     permission_classes = [IsAuthenticated]
 
@@ -96,42 +105,36 @@ class LogoutView(APIView):
                 {
                     "success": False,
                     "message": "Refresh token is required for logout.",
-                    "error": "Missing 'refresh' field in request body."
+                    "error": "Missing 'refresh' field in request body.",
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
             token = RefreshToken(refresh_token)
             token.blacklist()
-
-            return Response(
-                {
-                    "success": True,
-                    "message": "Successfully logged out. Token has been invalidated."
-                },
-                status=status.HTTP_200_OK
-            )
-
         except TokenError as e:
             return Response(
                 {
                     "success": False,
                     "message": "Logout failed.",
-                    "error": str(e)
+                    "error": str(e),
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
+        return Response(
+            {
+                "success": True,
+                "message": "Successfully logged out. Token has been invalidated.",
+            },
+            status=status.HTTP_200_OK,
+        )
 
-# ─────────────────────────────────────────────────────────────
-#  RegisterView  — POST /api/register/
-#  Permission: AllowAny (no token needed to create an account)
-# ─────────────────────────────────────────────────────────────
+
 class RegisterView(APIView):
     """
     Creates a new user account and returns JWT tokens immediately.
-    After registration the user is automatically logged in.
     """
     permission_classes = [AllowAny]
 
@@ -143,14 +146,14 @@ class RegisterView(APIView):
                 {
                     "success": False,
                     "message": "Registration failed. Please fix the errors below.",
-                    "errors": serializer.errors
+                    "errors": serializer.errors,
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         user = serializer.save()
         tokens = generate_tokens_for_user(user)
-        user_data = UserProfileSerializer(user).data
+        auth_identity = get_auth_identity(user)
 
         return Response(
             {
@@ -160,45 +163,36 @@ class RegisterView(APIView):
                     "access": tokens['access'],
                     "refresh": tokens['refresh'],
                 },
-                "user": user_data
+                "auth": auth_identity,
+                "role": auth_identity['role'],
+                "permissions": auth_identity['permissions'],
+                "user": UserProfileSerializer(user).data,
             },
-            status=status.HTTP_201_CREATED
+            status=status.HTTP_201_CREATED,
         )
 
 
-# ─────────────────────────────────────────────────────────────
-#  ProfileView  — GET/PATCH /api/profile/
-#  Permission: IsAuthenticated (PROTECTED — requires Bearer token)
-# ─────────────────────────────────────────────────────────────
 class ProfileView(APIView):
     """
     Returns or updates the authenticated user's profile.
-
-    Protected endpoint:
-      Client must send:  Authorization: Bearer <access_token>
-      JWTAuthentication middleware decodes the token and sets request.user.
-      Missing/invalid token returns 401 Unauthorized automatically.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """GET /api/profile/ — return user profile."""
-        serializer = UserProfileSerializer(request.user)
         return Response(
             {
                 "success": True,
                 "message": "Profile retrieved successfully.",
-                "user": serializer.data
+                "user": UserProfileSerializer(request.user).data,
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
     def patch(self, request):
-        """PATCH /api/profile/ — partial update of profile fields."""
         serializer = UserProfileSerializer(
             request.user,
             data=request.data,
-            partial=True
+            partial=True,
         )
 
         if not serializer.is_valid():
@@ -206,9 +200,9 @@ class ProfileView(APIView):
                 {
                     "success": False,
                     "message": "Profile update failed.",
-                    "errors": serializer.errors
+                    "errors": serializer.errors,
                 },
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         serializer.save()
@@ -216,7 +210,51 @@ class ProfileView(APIView):
             {
                 "success": True,
                 "message": "Profile updated successfully.",
-                "user": serializer.data
+                "user": serializer.data,
             },
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
+        )
+
+
+class RoleAssignmentView(APIView):
+    """
+    Assigns a role to a user. Only Directors can change roles.
+    """
+    permission_classes = [IsAuthenticated, IsDirector]
+
+    def patch(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response(
+                {
+                    "success": False,
+                    "message": "User not found.",
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = RoleAssignmentSerializer(user, data=request.data)
+
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "success": False,
+                    "message": "Role assignment failed.",
+                    "errors": serializer.errors,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user = serializer.save()
+
+        return Response(
+            {
+                "success": True,
+                "message": f"Role updated successfully for {user.username}.",
+                "role": get_role_identity(user),
+                "permissions": user.permissions,
+                "user": UserProfileSerializer(user).data,
+            },
+            status=status.HTTP_200_OK,
         )
