@@ -6,7 +6,7 @@
   <title>Sales CRM Workspace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-  <link href="./Sales CRM_files/css2" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #f4f7fb;
@@ -409,6 +409,7 @@
     }
     .toast.success { border-left: 4px solid var(--green); }
     .toast.error { border-left: 4px solid #dc2626; }
+    .toast.warning { border-left: 4px solid var(--amber); color: var(--amber); }
     @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
     @media (max-width: 1180px) {
@@ -425,9 +426,538 @@
       .form-grid { grid-template-columns: 1fr; }
       .avatar-copy { display: none; }
     }
+
+    /* ═══════════════════════════════════════════════════════════════
+       AUTH — LOGIN PAGE
+    ═══════════════════════════════════════════════════════════════ */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #060e0c;
+      transition: opacity 0.5s ease;
+    }
+    #authOverlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Animated background mesh */
+    .auth-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    .auth-bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+    .auth-bg-orb:nth-child(1) {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(15,108,92,0.35) 0%, transparent 70%);
+      top: -120px; left: -120px;
+      animation-delay: 0s;
+    }
+    .auth-bg-orb:nth-child(2) {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+      animation-delay: -3s;
+    }
+    .auth-bg-orb:nth-child(3) {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(15,108,92,0.15) 0%, transparent 70%);
+      top: 50%; left: 60%;
+      animation-delay: -5s;
+    }
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(20px, -30px) scale(1.05); }
+      66%       { transform: translate(-15px, 20px) scale(0.97); }
+    }
+
+    /* Grid texture overlay */
+    .auth-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    .auth-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 28px;
+      padding: 44px 44px 40px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03),
+        0 40px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+      backdrop-filter: blur(24px);
+      animation: authCardIn 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes authCardIn {
+      from { opacity: 0; transform: translateY(32px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .auth-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+    .auth-brand-badge {
+      width: 48px; height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), #17a589);
+      display: grid;
+      place-items: center;
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      color: white;
+      box-shadow: 0 8px 20px rgba(15,108,92,0.4);
+      flex: 0 0 auto;
+    }
+    .auth-brand-copy h2 {
+      margin: 0;
+      font-family: 'Sora', sans-serif;
+      font-size: 17px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+    .auth-brand-copy p {
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 500;
+    }
+
+    .auth-heading {
+      margin: 0 0 6px;
+      font-family: 'Sora', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+    }
+    .auth-subheading {
+      margin: 0 0 32px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.42);
+      line-height: 1.5;
+    }
+
+    .auth-field {
+      margin-bottom: 18px;
+    }
+    .auth-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .auth-input-wrap {
+      position: relative;
+    }
+    .auth-input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      opacity: 0.4;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .auth-field input {
+      width: 100%;
+      height: 52px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 0 16px 0 46px;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .auth-field input::placeholder { color: rgba(255,255,255,0.22); }
+    .auth-field input:focus {
+      border-color: rgba(15,108,92,0.7);
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 0 0 4px rgba(15,108,92,0.15);
+    }
+    .auth-field input:focus + .auth-input-icon,
+    .auth-input-wrap:focus-within .auth-input-icon { opacity: 0.75; }
+    .auth-field input.auth-error {
+      border-color: rgba(220,38,38,0.7);
+      box-shadow: 0 0 0 4px rgba(220,38,38,0.12);
+    }
+
+    /* Password toggle */
+    .auth-pw-toggle {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      padding: 4px;
+      font-size: 14px;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+    .auth-pw-toggle:hover { color: rgba(255,255,255,0.7); }
+
+    .auth-error-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(220,38,38,0.12);
+      border: 1px solid rgba(220,38,38,0.25);
+      border-radius: 12px;
+      margin-bottom: 18px;
+      color: #f87171;
+      font-size: 13px;
+      font-weight: 600;
+      animation: shake 0.4s ease;
+    }
+    .auth-error-banner.visible { display: flex; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-6px); }
+      40%       { transform: translateX(6px); }
+      60%       { transform: translateX(-4px); }
+      80%       { transform: translateX(4px); }
+    }
+
+    .auth-btn {
+      width: 100%;
+      height: 54px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, #17a589 100%);
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+      box-shadow: 0 12px 28px rgba(15,108,92,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.01em;
+    }
+    .auth-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.14) 0%, transparent 60%);
+      border-radius: inherit;
+    }
+    .auth-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(15,108,92,0.4);
+    }
+    .auth-btn:active:not(:disabled) { transform: translateY(0); }
+    .auth-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    /* Loading spinner */
+    .auth-spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Dashboard hidden while on login */
+    #appShell { display: none; }
+    #appShell.auth-visible { display: grid; animation: dashIn 0.4s ease both; }
+    @keyframes dashIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Logout button in profile menu */
+    .profile-item.logout-item { color: #dc2626; }
+
+    /* Auth session indicator in topbar */
+    .auth-session-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+      background: var(--green-soft);
+      border: 1px solid rgba(5,150,105,0.2);
+      border-radius: 999px;
+      padding: 4px 10px;
+    }
+    .auth-session-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FIX 1 — REMEMBER ME CHECKBOX
+    ═══════════════════════════════════════════════════════════════ */
+    .auth-remember-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 6px 0 20px;
+    }
+    .auth-remember-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+    /* Hide native checkbox */
+    .auth-remember-label input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+      pointer-events: none;
+    }
+    /* Custom checkbox box */
+    .auth-remember-checkbox {
+      width: 18px; height: 18px;
+      border-radius: 6px;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    /* Checkmark via pseudo-element */
+    .auth-remember-checkbox::after {
+      content: '';
+      width: 5px; height: 9px;
+      border: 2px solid white;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translateY(-1px);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+    }
+    /* Checked state */
+    .auth-remember-label input:checked + .auth-remember-checkbox {
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15,108,92,0.2);
+    }
+    .auth-remember-label input:checked + .auth-remember-checkbox::after {
+      opacity: 1;
+    }
+    .auth-remember-label:hover .auth-remember-checkbox {
+      border-color: rgba(255,255,255,0.4);
+    }
+    .auth-remember-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FIX 2 — BROWSER AUTOFILL STYLING (Chrome / Edge / WebKit)
+       Overrides the default yellow/white autofill background to match
+       the dark glass-morphism login card design.
+    ═══════════════════════════════════════════════════════════════ */
+    .auth-field input:-webkit-autofill,
+    .auth-field input:-webkit-autofill:hover,
+    .auth-field input:-webkit-autofill:focus,
+    .auth-field input:-webkit-autofill:active {
+      /* Trick: use an enormous inset box-shadow to repaint the background */
+      -webkit-box-shadow: 0 0 0 1000px rgba(15, 25, 22, 0.95) inset !important;
+      box-shadow: 0 0 0 1000px rgba(15, 25, 22, 0.95) inset !important;
+      -webkit-text-fill-color: #ffffff !important;
+      caret-color: #ffffff;
+      border-color: rgba(15,108,92,0.5) !important;
+      border-radius: 14px;
+      transition: background-color 9999s ease-in-out 0s; /* Delay browser override */
+    }
+    /* Firefox autofill */
+    .auth-field input:autofill {
+      background: rgba(15, 25, 22, 0.95) !important;
+      color: #ffffff !important;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       FIX 3 — MOBILE RESPONSIVENESS FOR AUTH CARD
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* Tablets (max 768px) */
+    @media (max-width: 768px) {
+      .auth-card {
+        padding: 36px 32px 32px;
+        border-radius: 22px;
+        margin: 0 16px;
+      }
+      .auth-heading { font-size: 22px; }
+      .auth-subheading { font-size: 13px; margin-bottom: 24px; }
+      .auth-brand { margin-bottom: 28px; }
+      .auth-brand-copy h2 { font-size: 15px; }
+      .auth-field input { height: 48px; font-size: 14px; }
+      .auth-btn { height: 50px; font-size: 14px; }
+    }
+
+    /* Small phones (max 480px) */
+    @media (max-width: 480px) {
+      #authOverlay { align-items: flex-start; padding-top: 40px; overflow-y: auto; }
+      .auth-card {
+        padding: 28px 20px 24px;
+        border-radius: 18px;
+        margin: 0 12px 40px;
+        max-width: 100%;
+      }
+      .auth-heading { font-size: 20px; }
+      .auth-subheading { font-size: 12px; margin-bottom: 20px; }
+      .auth-brand { margin-bottom: 22px; gap: 10px; }
+      .auth-brand-badge { width: 40px; height: 40px; font-size: 13px; border-radius: 12px; }
+      .auth-brand-copy h2 { font-size: 14px; }
+      .auth-brand-copy p { font-size: 11px; }
+      .auth-field { margin-bottom: 14px; }
+      .auth-field input { height: 46px; font-size: 14px; padding: 0 14px 0 42px; }
+      .auth-btn { height: 48px; font-size: 14px; margin-top: 4px; }
+      .auth-remember-text { font-size: 12px; }
+      .auth-error-banner { font-size: 12px; padding: 10px 12px; }
+    }
+
+    /* Very small screens (max 360px) */
+    @media (max-width: 360px) {
+      .auth-card { padding: 24px 16px 20px; margin: 0 8px 32px; }
+      .auth-heading { font-size: 18px; }
+      .auth-field input { height: 44px; }
+      .auth-btn { height: 46px; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       AUTH OVERLAY — Login Page
+  ═══════════════════════════════════════════════════════════════ -->
+  <div id="authOverlay" role="main" aria-label="Login">
+    <!-- Animated background -->
+    <div class="auth-bg" aria-hidden="true">
+      <div class="auth-bg-orb"></div>
+      <div class="auth-bg-orb"></div>
+      <div class="auth-bg-orb"></div>
+      <div class="auth-grid"></div>
+    </div>
+
+    <!-- Login card -->
+    <div class="auth-card" role="form" aria-labelledby="authHeading">
+
+      <div class="auth-brand">
+        <div class="auth-brand-badge">SC</div>
+        <div class="auth-brand-copy">
+          <h2>Sales Command</h2>
+          <p>Professional CRM Workspace</p>
+        </div>
+      </div>
+
+      <h1 class="auth-heading" id="authHeading">Welcome back</h1>
+      <p class="auth-subheading">Sign in to access your CRM dashboard and sales tools.</p>
+
+      <!-- Error banner -->
+      <div class="auth-error-banner" id="authErrorBanner" role="alert" aria-live="assertive">
+        <span>⚠</span>
+        <span id="authErrorText">Invalid credentials. Please try again.</span>
+      </div>
+
+      <!-- Login form -->
+      <form id="loginForm" novalidate autocomplete="on">
+
+        <div class="auth-field">
+          <label for="authUsername">Username or Email</label>
+          <div class="auth-input-wrap">
+            <input
+              type="text"
+              id="authUsername"
+              name="username"
+              placeholder="Enter username or email"
+              autocomplete="username"
+              aria-required="true"
+            />
+            <span class="auth-input-icon" aria-hidden="true">👤</span>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="authPassword">Password</label>
+          <div class="auth-input-wrap">
+            <input
+              type="password"
+              id="authPassword"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              aria-required="true"
+            />
+            <span class="auth-input-icon" aria-hidden="true">🔑</span>
+            <button type="button" class="auth-pw-toggle" id="pwToggle" aria-label="Toggle password visibility">
+              👁
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember Me -->
+        <div class="auth-remember-row">
+          <label class="auth-remember-label" for="rememberMe">
+            <input type="checkbox" id="rememberMe" name="rememberMe" />
+            <span class="auth-remember-checkbox" aria-hidden="true"></span>
+            <span class="auth-remember-text">Remember me for 7 days</span>
+          </label>
+        </div>
+
+        <button type="submit" class="auth-btn" id="loginBtn" aria-label="Sign in">
+          <span id="loginBtnText">Sign In</span>
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+
   <div class="app-shell" id="appShell">
     <aside class="sidebar" id="sidebar">
           <div class="brand">
@@ -531,15 +1061,12 @@
             <div class="toolbar-left">
               <select class="control" data-filter="enquiries" data-filter-key="status">
                 <option value="all" selected="">All Status</option>
-                <option value="submitted">Submitted</option><option value="draft">Draft</option><option value="closed">Closed</option>
               </select>
               <select class="control" data-filter="enquiries" data-filter-key="vehicle">
                 <option value="all" selected="">All Vehicles</option>
-                <option value="fa">FA</option><option value="220">220</option><option value="fascino">Fascino</option><option value="fz-s">FZ-S</option><option value="rayzr">RayZR</option><option value="mt-15">MT-15</option><option value="xsr">XSR</option><option value="fz-x">FZ-X</option><option value="r15">R15</option><option value="aerox">Aerox</option>
               </select>
               <select class="control" data-filter="enquiries" data-filter-key="date">
                 <option value="all" selected="">All Dates</option>
-                <option value="2026-04">2026-04</option>
               </select>
             </div>
             <div class="toolbar-right">
@@ -552,55 +1079,7 @@
               <thead>
                 <tr><th>ID</th><th>Customer Name</th><th>Vehicle Model</th><th>Lead Temp</th><th>Status</th><th>Date</th><th>Source</th></tr>
               </thead>
-              <tbody>
-              <tr>
-                <td>SE-53446</td><td>Pavan</td><td>FA</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-19</td><td>Walk-in</td>
-              </tr>
-            
-              <tr>
-                <td>SE-12806</td><td>Raja</td><td>220</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-19</td><td>Walk-in</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00054</td><td>Rithwik</td><td>Fascino</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-14</td><td>Walk-in</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00053</td><td>Siva</td><td>FZ-S</td><td><span class="badge warm">Warm</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-13</td><td>Phone</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00052</td><td>Raja</td><td>RayZR</td><td><span class="badge cold">Cold</span></td><td><span class="badge draft">Draft</span></td><td>2026-04-13</td><td>Website</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00051</td><td>Vadivelu</td><td>MT-15</td><td><span class="badge warm">Warm</span></td><td><span class="badge closed">Closed</span></td><td>2026-04-12</td><td>Referral</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00050</td><td>Naveen</td><td>XSR</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-11</td><td>Walk-in</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00049</td><td>Kesavan</td><td>FZ-X</td><td><span class="badge cold">Cold</span></td><td><span class="badge draft">Draft</span></td><td>2026-04-10</td><td>Phone</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00048</td><td>Rathish</td><td>R15</td><td><span class="badge warm">Warm</span></td><td><span class="badge closed">Closed</span></td><td>2026-04-10</td><td>Website</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00047</td><td>Anitha</td><td>Fascino</td><td><span class="badge hot">Hot</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-09</td><td>Walk-in</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00046</td><td>Deepa</td><td>Aerox</td><td><span class="badge warm">Warm</span></td><td><span class="badge submitted">Submitted</span></td><td>2026-04-08</td><td>Referral</td>
-              </tr>
-            
-              <tr>
-                <td>SE-00045</td><td>Mohan</td><td>RayZR</td><td><span class="badge cold">Cold</span></td><td><span class="badge draft">Draft</span></td><td>2026-04-08</td><td>Website</td>
-              </tr>
-            </tbody>
+              <tbody></tbody>
             </table>
           </div>
         </div>
@@ -612,19 +1091,432 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <script>
+    /* ═══════════════════════════════════════════════════════════════
+       AUTH MODULE — Complete Frontend Authentication Workflow
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* ── Auth Token Keys ── */
+    const AUTH_KEYS = {
+      ACCESS_TOKEN:    'crm_accessToken',
+      REFRESH_TOKEN:   'crm_refreshToken',
+      LOGGED_IN_USER:  'crm_loggedInUser',
+      TOKEN_EXPIRY:    'crm_tokenExpiry',
+      REMEMBER_ME:     'crm_rememberMe',
+      REMEMBERED_USER: 'crm_rememberedUser'
+    };
+
+    /* ── Session-expiry notification flag (sessionStorage, cleared on browser close) ── */
+    const SESSION_EXPIRED_FLAG = 'crm_sessionExpired';
+
+    /* ── Refresh lock: prevents concurrent refresh storms ── */
+    let _refreshing = null;
+
+    /* ═══════════════════════════════════════════════════════════════
+       AUTH — Core Functions
+    ═══════════════════════════════════════════════════════════════ */
+    const Auth = {
+
+      /* ── Save tokens with expiry based on Remember Me ── */
+      saveTokens(username, accessToken, refreshToken, rememberMe = false) {
+        const duration = rememberMe
+          ? 7 * 24 * 3600 * 1000   // 7 days if remembered
+          : 3600 * 1000;            // 1 hour default
+        const expiry = Date.now() + duration;
+
+        localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN,   accessToken);
+        localStorage.setItem(AUTH_KEYS.REFRESH_TOKEN,  refreshToken);
+        localStorage.setItem(AUTH_KEYS.LOGGED_IN_USER, username);
+        localStorage.setItem(AUTH_KEYS.TOKEN_EXPIRY,   String(expiry));
+      },
+
+      /* ── Save/load/clear Remember Me preferences ── */
+      saveSession(username, rememberMe) {
+        if (rememberMe) {
+          localStorage.setItem(AUTH_KEYS.REMEMBER_ME,     'true');
+          localStorage.setItem(AUTH_KEYS.REMEMBERED_USER, username);
+        } else {
+          // Not remembered — clear any previous remembered state
+          localStorage.removeItem(AUTH_KEYS.REMEMBER_ME);
+          localStorage.removeItem(AUTH_KEYS.REMEMBERED_USER);
+        }
+      },
+
+      loadRememberedUser() {
+        const isRemembered = localStorage.getItem(AUTH_KEYS.REMEMBER_ME) === 'true';
+        if (isRemembered) {
+          return localStorage.getItem(AUTH_KEYS.REMEMBERED_USER) || null;
+        }
+        return null;
+      },
+
+      clearRememberedSession() {
+        localStorage.removeItem(AUTH_KEYS.REMEMBER_ME);
+        localStorage.removeItem(AUTH_KEYS.REMEMBERED_USER);
+      },
+
+      /* ── Clear all auth tokens ── */
+      clearTokens() {
+        localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
+        localStorage.removeItem(AUTH_KEYS.REFRESH_TOKEN);
+        localStorage.removeItem(AUTH_KEYS.LOGGED_IN_USER);
+        localStorage.removeItem(AUTH_KEYS.TOKEN_EXPIRY);
+        // Note: REMEMBER_ME and REMEMBERED_USER are intentionally preserved
+        // here so the username is still pre-filled after session expiry.
+        // They are only cleared on explicit logoutUser() call.
+      },
+
+      /* ── Check if user is authenticated (token exists + not expired) ── */
+      isAuthenticated() {
+        const token  = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
+        const expiry = parseInt(localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY) || '0', 10);
+        if (!token) return false;
+        if (expiry && Date.now() > expiry) {
+          // Token expired — set notification flag, clear tokens
+          sessionStorage.setItem(SESSION_EXPIRED_FLAG, 'true');
+          this.clearTokens();
+          return false;
+        }
+        return true;
+      },
+
+      /* ── Get the currently logged-in username ── */
+      getLoggedInUser() {
+        return localStorage.getItem(AUTH_KEYS.LOGGED_IN_USER) || null;
+      },
+
+      /* ── Get access token (for use in API requests) ── */
+      getAccessToken() {
+        return localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN) || null;
+      },
+
+      /* ── Validate login form fields ── */
+      validateLoginForm(username, password) {
+        const errors = [];
+        if (!username || !username.trim()) {
+          errors.push({ field: 'username', message: 'Username or email is required.' });
+        } else if (username.trim().length < 3) {
+          errors.push({ field: 'username', message: 'Username must be at least 3 characters.' });
+        }
+        if (!password || !password.trim()) {
+          errors.push({ field: 'password', message: 'Password is required.' });
+        } else if (password.length < 6) {
+          errors.push({ field: 'password', message: 'Password must be at least 6 characters.' });
+        }
+        return { valid: errors.length === 0, errors };
+      },
+
+      /* ── Main loginUser function ── */
+      async loginUser(username, password, rememberMe = false) {
+        const response = await fetch('http://127.0.0.1:8000/api/token/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.detail || 'Invalid credentials');
+        }
+
+        const data = await response.json();
+        this.saveTokens(username, data.access, data.refresh, rememberMe);
+        this.saveSession(username, rememberMe);
+        return data;
+      },
+
+      /* ── Logout: clears all tokens, resets appState, returns to login ── */
+      logoutUser() {
+        this.clearTokens();
+        this.clearRememberedSession();
+        this._resetAppState();
+        // Clear in-memory data store so stale data is never visible after re-login
+        if (typeof Store !== 'undefined') {
+          Store.setEnquiries([]);
+          Store.setAppointments([]);
+          Store.setFeedback([]);
+        }
+        this.showLoginPage();
+        Utils.toast('You have been signed out successfully.', 'success');
+      },
+
+      /* ── FIX 4: Full appState reset on logout ── */
+      _resetAppState() {
+        appState.currentView       = 'dashboard';
+        appState.sidebarCollapsed  = false;
+        appState.mobileSidebarOpen = false;
+        appState.search            = '';
+        appState.filters = {
+          enquiries:    { status: 'all', vehicle: 'all', date: 'all' },
+          appointments: { status: 'all', vehicle: 'all', date: 'all' },
+          feedback:     { status: 'all', vehicle: 'all', date: 'all' }
+        };
+        appState.formDraft = {};
+        // Clear persisted UI state so next login starts fresh
+        try { localStorage.removeItem(LS_KEY + '_' + UI_STATE_STORAGE_KEY); } catch {}
+      },
+
+      /* ── authFetch: Authenticated API requests with automatic token refresh ── */
+      async authFetch(url, options = {}, _isRetry = false) {
+        const token = this.getAccessToken();
+        const headers = {
+          'Content-Type': 'application/json',
+          ...(options.headers || {}),
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        };
+
+        const response = await fetch(url, { ...options, headers });
+
+        if (response.status === 401 && !_isRetry) {
+          // Attempt token refresh exactly once
+          const refreshed = await this.refreshAccessToken();
+          if (refreshed) {
+            // Retry original request with new token
+            return this.authFetch(url, options, true);
+          }
+          // Refresh failed — force logout with session expired notice
+          sessionStorage.setItem(SESSION_EXPIRED_FLAG, 'true');
+          this.clearTokens();
+          this._resetAppState();
+          this.showLoginPage();
+          this._checkSessionExpiry();
+          throw new Error('Session expired. Please sign in again.');
+        }
+
+        return response;
+      },
+
+      /* ── Token Refresh: calls /api/token/refresh/ and updates access token ── */
+      async refreshAccessToken() {
+        // Deduplicate concurrent refresh calls — only one in-flight at a time
+        if (_refreshing) return _refreshing;
+
+        _refreshing = (async () => {
+          try {
+            const refreshToken = localStorage.getItem(AUTH_KEYS.REFRESH_TOKEN);
+            if (!refreshToken) return false;
+
+            const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+              method:  'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body:    JSON.stringify({ refresh: refreshToken })
+            });
+
+            if (!response.ok) return false;
+
+            const data = await response.json();
+            if (!data.access) return false;
+
+            // Update stored access token and extend expiry
+            localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, data.access);
+            const currentExpiry = parseInt(localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY) || '0', 10);
+            const isRemembered  = localStorage.getItem(AUTH_KEYS.REMEMBER_ME) === 'true';
+            const duration      = isRemembered ? 7 * 24 * 3600 * 1000 : 3600 * 1000;
+            localStorage.setItem(AUTH_KEYS.TOKEN_EXPIRY, String(Date.now() + duration));
+
+            return true;
+          } catch {
+            return false;
+          } finally {
+            _refreshing = null;
+          }
+        })();
+
+        return _refreshing;
+      },
+
+      /* ── Show dashboard (called after successful login) ── */
+      showDashboard() {
+        const overlay = document.getElementById('authOverlay');
+        const shell   = document.getElementById('appShell');
+        if (overlay) {
+          overlay.style.opacity = '0';
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.classList.add('hidden');
+          }, 500);
+        }
+        if (shell) shell.classList.add('auth-visible');
+      },
+
+      /* ── Show login page (called on logout or unauthenticated access) ── */
+      showLoginPage() {
+        const overlay = document.getElementById('authOverlay');
+        const shell   = document.getElementById('appShell');
+        if (overlay) {
+          overlay.style.display = 'flex';
+          overlay.style.opacity = '1';
+          overlay.classList.remove('hidden');
+          // Reset form state
+          const form = document.getElementById('loginForm');
+          if (form) form.reset();
+          const errBanner = document.getElementById('authErrorBanner');
+          if (errBanner) errBanner.classList.remove('visible');
+          // Re-populate remembered username if applicable
+          this._restoreRememberedUser();
+        }
+        if (shell) shell.classList.remove('auth-visible');
+      },
+
+      /* ── Pre-fill remembered username on login page ── */
+      _restoreRememberedUser() {
+        const remembered = this.loadRememberedUser();
+        const usernameEl = document.getElementById('authUsername');
+        const rememberEl = document.getElementById('rememberMe');
+        if (usernameEl && remembered) {
+          usernameEl.value = remembered;
+        }
+        if (rememberEl && remembered) {
+          rememberEl.checked = true;
+        }
+      },
+
+      /* ── FIX 5: Show session expiry notification if flag is set ── */
+      _checkSessionExpiry() {
+        const wasExpired = sessionStorage.getItem(SESSION_EXPIRED_FLAG);
+        if (wasExpired) {
+          sessionStorage.removeItem(SESSION_EXPIRED_FLAG);
+          // Delay slightly so the login page renders first
+          setTimeout(() => {
+            const errBanner = document.getElementById('authErrorBanner');
+            const errText   = document.getElementById('authErrorText');
+            if (errBanner && errText) {
+              errText.textContent = 'Your session has expired. Please sign in again.';
+              errBanner.classList.add('visible');
+            }
+            // Also fire an amber-styled toast for clear UX feedback
+            Utils.toast('Session expired — please sign in again.', 'warning');
+          }, 300);
+        }
+      },
+
+      /* ── Initialize authentication on page load ── */
+      initializeAuth() {
+        return new Promise(resolve => {
+          if (this.isAuthenticated()) {
+            this.showDashboard();
+            resolve();
+          } else {
+            this.showLoginPage();
+            this._checkSessionExpiry();
+            resolve();
+          }
+          this._bindLoginForm();
+        });
+      },
+
+      /* ── Bind login form events ── */
+      _bindLoginForm() {
+        const form      = document.getElementById('loginForm');
+        const loginBtn  = document.getElementById('loginBtn');
+        const pwToggle  = document.getElementById('pwToggle');
+        const pwInput   = document.getElementById('authPassword');
+        const errBanner = document.getElementById('authErrorBanner');
+        const errText   = document.getElementById('authErrorText');
+
+        if (!form) return;
+
+        // Password visibility toggle
+        if (pwToggle && pwInput) {
+          pwToggle.addEventListener('click', () => {
+            const isHidden = pwInput.type === 'password';
+            pwInput.type = isHidden ? 'text' : 'password';
+            pwToggle.textContent = isHidden ? '🙈' : '👁';
+          });
+        }
+
+        // Clear error styling on input
+        ['authUsername', 'authPassword'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', () => {
+              el.classList.remove('auth-error');
+              if (errBanner) errBanner.classList.remove('visible');
+            });
+          }
+        });
+
+        // Form submit
+        form.addEventListener('submit', async e => {
+          e.preventDefault();
+
+          const usernameEl  = document.getElementById('authUsername');
+          const passwordEl  = document.getElementById('authPassword');
+          const rememberEl  = document.getElementById('rememberMe');
+          const username    = usernameEl?.value || '';
+          const password    = passwordEl?.value || '';
+          const rememberMe  = rememberEl?.checked || false;
+
+          // Frontend validation
+          const validation = Auth.validateLoginForm(username, password);
+          if (!validation.valid) {
+            validation.errors.forEach(err => {
+              const fieldEl = document.getElementById(
+                err.field === 'username' ? 'authUsername' : 'authPassword'
+              );
+              if (fieldEl) fieldEl.classList.add('auth-error');
+            });
+            if (errBanner && errText) {
+              errText.textContent = validation.errors[0].message;
+              errBanner.classList.add('visible');
+            }
+            return;
+          }
+
+          // Loading state
+          if (loginBtn) {
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="auth-spinner"></span>';
+          }
+
+          try {
+            await Auth.loginUser(username, password, rememberMe);
+
+            // Load backend data now that the user is authenticated
+            await loadEnquiriesFromApi();
+            await loadAppointmentsFromApi();
+            await loadFeedbackFromApi();
+
+            // Success — transition to dashboard
+            Auth.showDashboard();
+            Utils.toast(`Welcome back, ${Auth.getLoggedInUser()}! 🎉`, 'success');
+
+            // Re-render topbar to show logged-in user info
+            Renderer.topbar();
+
+          } catch (err) {
+            // Failed login — highlight fields and show error
+            if (usernameEl) usernameEl.classList.add('auth-error');
+            if (passwordEl) passwordEl.classList.add('auth-error');
+            if (errBanner && errText) {
+              errText.textContent = 'Invalid username or password. Please try again.';
+              errBanner.classList.add('visible');
+            }
+          } finally {
+            if (loginBtn) {
+              loginBtn.disabled = false;
+              loginBtn.innerHTML = '<span id="loginBtnText">Sign In</span>';
+            }
+          }
+        });
+      }
+    };
+
+    /* ─────────────────────────────────────────────────────────────
+       END OF AUTH MODULE
+    ───────────────────────────────────────────────────────────── */
+
     const API_BASE = 'http://127.0.0.1:8000/api';
 
     const Api = {
       async getEnquiries() {
-        const response = await fetch(`${API_BASE}/enquiry/`);
+        const response = await Auth.authFetch(`${API_BASE}/enquiry/`);
         if (!response.ok) throw new Error('Failed to fetch enquiries');
         return response.json();
       },
 
       async createEnquiry(payload) {
-        const response = await fetch(`${API_BASE}/enquiry/create/`, {
+        const response = await Auth.authFetch(`${API_BASE}/enquiry/create/`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await response.json();
@@ -633,15 +1525,14 @@
       },
 
       async getAppointments() {
-        const response = await fetch(`${API_BASE}/appointment/`);
+        const response = await Auth.authFetch(`${API_BASE}/appointment/`);
         if (!response.ok) throw new Error('Failed to fetch appointments');
         return response.json();
       },
 
       async createAppointment(payload) {
-        const response = await fetch(`${API_BASE}/appointment/create/`, {
+        const response = await Auth.authFetch(`${API_BASE}/appointment/create/`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await response.json();
@@ -650,15 +1541,14 @@
       },
 
       async getFeedback() {
-        const response = await fetch(`${API_BASE}/feedback/`);
+        const response = await Auth.authFetch(`${API_BASE}/feedback/`);
         if (!response.ok) throw new Error('Failed to fetch feedback');
         return response.json();
       },
 
       async createFeedback(payload) {
-        const response = await fetch(`${API_BASE}/feedback/create/`, {
+        const response = await Auth.authFetch(`${API_BASE}/feedback/create/`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
         const data = await response.json();
@@ -688,37 +1578,6 @@
     /* ═══════════════════════════════════════════════════════════════
        DATA STORE
     ═══════════════════════════════════════════════════════════════ */
-
-    /* ── Seed data (used only when localStorage is empty) ── */
-    const SEED = {
-      enquiries: [
-        { id: 'SE-00054', customer: 'Rithwik',  vehicle: 'Fascino', temperature: 'Hot',  status: 'Submitted', date: '2026-04-14', source: 'Walk-in'  },
-        { id: 'SE-00053', customer: 'Siva',      vehicle: 'FZ-S',    temperature: 'Warm', status: 'Submitted', date: '2026-04-13', source: 'Phone'    },
-        { id: 'SE-00052', customer: 'Raja',      vehicle: 'RayZR',   temperature: 'Cold', status: 'Draft',     date: '2026-04-13', source: 'Website'  },
-        { id: 'SE-00051', customer: 'Vadivelu',  vehicle: 'MT-15',   temperature: 'Warm', status: 'Closed',    date: '2026-04-12', source: 'Referral' },
-        { id: 'SE-00050', customer: 'Naveen',    vehicle: 'XSR',     temperature: 'Hot',  status: 'Submitted', date: '2026-04-11', source: 'Walk-in'  },
-        { id: 'SE-00049', customer: 'Kesavan',   vehicle: 'FZ-X',    temperature: 'Cold', status: 'Draft',     date: '2026-04-10', source: 'Phone'    },
-        { id: 'SE-00048', customer: 'Rathish',   vehicle: 'R15',     temperature: 'Warm', status: 'Closed',    date: '2026-04-10', source: 'Website'  },
-        { id: 'SE-00047', customer: 'Anitha',    vehicle: 'Fascino', temperature: 'Hot',  status: 'Submitted', date: '2026-04-09', source: 'Walk-in'  },
-        { id: 'SE-00046', customer: 'Deepa',     vehicle: 'Aerox',   temperature: 'Warm', status: 'Submitted', date: '2026-04-08', source: 'Referral' },
-        { id: 'SE-00045', customer: 'Mohan',     vehicle: 'RayZR',   temperature: 'Cold', status: 'Draft',     date: '2026-04-08', source: 'Website'  }
-      ],
-      appointments: [
-        { id: 'SABP-0001', customer: 'Rithwik', vehicle: 'Fascino', status: 'Scheduled', date: '2026-04-18', time: '10:30 AM' },
-        { id: 'SABP-0002', customer: 'Anitha',  vehicle: 'Fascino', status: 'Completed', date: '2026-04-17', time: '12:00 PM' },
-        { id: 'SABP-0003', customer: 'Naveen',  vehicle: 'XSR',     status: 'Scheduled', date: '2026-04-19', time: '03:30 PM' },
-        { id: 'SABP-0004', customer: 'Raja',    vehicle: 'RayZR',   status: 'Pending',   date: '2026-04-20', time: '11:15 AM' },
-        { id: 'SABP-0005', customer: 'Siva',    vehicle: 'FZ-S',    status: 'Completed', date: '2026-04-15', time: '04:15 PM' }
-      ],
-      feedback: [
-        { id: 'SF-00068', enquiryId: 'SE-00008', customer: 'Rajobalan', vehicle: 'R15',     status: 'Draft',     date: '2026-04-10' },
-        { id: 'SF-00067', enquiryId: 'SE-00014', customer: 'Rithwik',   vehicle: 'Fascino', status: 'Submitted', date: '2026-04-11' },
-        { id: 'SF-00066', enquiryId: 'SE-00087', customer: 'Rathish',   vehicle: 'FZ-S',    status: 'Draft',     date: '2026-04-12' },
-        { id: 'SF-00065', enquiryId: 'SE-00066', customer: 'Harishnan', vehicle: 'Fascino', status: 'Draft',     date: '2026-04-12' },
-        { id: 'SF-00064', enquiryId: 'SE-00055', customer: 'Senthoni',  vehicle: 'RayZR',   status: 'Submitted', date: '2026-04-14' },
-        { id: 'SF-00063', enquiryId: 'SE-00043', customer: 'Shanthi',   vehicle: 'RayZR',   status: 'Draft',     date: '2026-04-15' }
-      ]
-    };
 
     /* ── localStorage helpers ── */
     const LS_KEY = 'salesCRM_modular';
@@ -941,7 +1800,9 @@
         const container = document.getElementById('toastContainer');
         const el = document.createElement('div');
         el.className = `toast ${type}`;
-        el.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span> ${Utils.escape(message)}`;
+        const icons = { success: '✓', error: '✕', warning: '⚠' };
+        const icon = icons[type] || '✓';
+        el.innerHTML = `<span>${icon}</span> ${Utils.escape(message)}`;
         container.appendChild(el);
         setTimeout(() => {
           el.style.opacity = '0';
@@ -1007,6 +1868,12 @@
 
       /* ── Topbar ── */
       topbar() {
+        const user = Auth.getLoggedInUser();
+        const initials = user
+          ? user.split('@')[0].slice(0, 2).toUpperCase()
+          : 'SC';
+        const displayName = user || 'Sales Executive';
+
         return `
           <div class="topbar-left">
             <button class="icon-btn" id="sidebarToggle" aria-label="Toggle sidebar">☰</button>
@@ -1018,20 +1885,24 @@
             </div>
           </div>
           <div class="topbar-right">
+            <span class="auth-session-badge" title="Session active">
+              <span class="auth-session-dot"></span>
+              Secured
+            </span>
             <button class="icon-btn" title="Notifications">🔔</button>
             <button class="icon-btn" title="Help">?</button>
             <div style="position:relative;">
               <button class="avatar-btn" id="avatarBtn" aria-haspopup="true" aria-expanded="false">
-                <div class="avatar">DK</div>
+                <div class="avatar">${initials}</div>
                 <div class="avatar-copy">
-                  <strong>Sales Executive</strong>
+                  <strong>${Utils.escape(displayName)}</strong>
                   <span>CRM Workspace</span>
                 </div>
               </button>
               <div class="profile-menu" id="profileMenu" role="menu">
                 <div class="profile-item" role="menuitem">👤 Profile</div>
                 <div class="profile-item" role="menuitem">⚙ Settings</div>
-                <div class="profile-item" role="menuitem">⇥ Sign out</div>
+                <div class="profile-item logout-item" id="logoutBtn" role="menuitem">⇥ Sign out</div>
               </div>
             </div>
           </div>
@@ -1588,6 +2459,15 @@
           profileMenu.classList.remove('open');
           avatarBtn.setAttribute('aria-expanded', 'false');
         });
+
+        // Logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            Auth.logoutUser();
+          });
+        }
       },
 
       pageContent() {
@@ -1812,10 +2692,9 @@
       }
     };
 
-init();
 async function loadEnquiriesFromApi() {
   try {
-    const response = await fetch('http://127.0.0.1:8000/api/enquiry/');
+    const response = await Auth.authFetch('http://127.0.0.1:8000/api/enquiry/');
     const data = await response.json();
 
     const mapped = data.map(item => ({
@@ -1880,9 +2759,19 @@ async function loadEnquiriesFromApi() {
     ═══════════════════════════════════════════════════════════════ */
   async function init() {
   Persist.loadUI();
-  await loadEnquiriesFromApi();
-  await loadAppointmentsFromApi();
-  await loadFeedbackFromApi();
+
+  // Auth MUST be initialized before any protected data is loaded.
+  // initializeAuth() shows the login page if no valid session exists
+  // and wires up the login form. Data loading only proceeds when authenticated.
+  await Auth.initializeAuth();
+
+  // Only load backend data if the user is authenticated
+  if (Auth.isAuthenticated()) {
+    await loadEnquiriesFromApi();
+    await loadAppointmentsFromApi();
+    await loadFeedbackFromApi();
+  }
+
   Renderer.topbar();
   Renderer.pageContent();
   Renderer.sidebar();
