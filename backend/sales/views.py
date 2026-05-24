@@ -87,22 +87,76 @@ def create_feedback(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-from .services import process_chat_query
+from .services import process_chat_query, get_chatbot_instance
 
 @api_view(['POST'])
 def chat_api(request):
     query = request.data.get('query')
     if not query:
         return Response({
-            "status": "error",
-            "message": "Missing 'query' in request body."
+            "error": "Missing 'query' in request body."
         }, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         response_data = process_chat_query(query)
-        return Response(response_data, status=status.HTTP_200_OK)
+        # Return format expected by Platinum_Sales_Chatbot index.html
+        return Response({
+            "answer": response_data["response"],
+            "intent": response_data["metadata"]["intent"],
+            "elapsed": response_data["metadata"]["latency_seconds"]
+        }, status=status.HTTP_200_OK)
+    except Exception as exc:
+        return Response({
+            "error": f"Internal Server Error: {str(exc)}"
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['GET'])
+def health_api(request):
+    """Returns the health status of the chatbot."""
+    try:
+        instance = get_chatbot_instance()
+        import test as chatbot_test_module
+        llm_ready = getattr(chatbot_test_module, "_llm_ready", False)
+        return Response({
+            "status": "ok",
+            "chatbot_ready": instance is not None,
+            "llm_ready": llm_ready
+        }, status=status.HTTP_200_OK)
     except Exception as exc:
         return Response({
             "status": "error",
-            "message": f"Internal Server Error: {str(exc)}"
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            "chatbot_ready": False,
+            "message": str(exc)
+        }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def suggestions_api(request):
+    """Returns pre-defined query suggestions."""
+    suggestions = [
+        "Show all enquiries",
+        "Who gave bad feedback?",
+        "All cancelled appointments",
+        "Show ENQ001 full details",
+        "Returning customers",
+        "Customers from Chennai",
+        "Who hasn't taken a test ride?",
+        "Show me new leads",
+        "What's Divya's feedback?",
+        "Is Arjun's appointment confirmed?",
+        "What car did Sneha enquire about?",
+        "Show good feedback customers",
+        "All completed appointments",
+        "Payment type breakdown",
+    ]
+    return Response({"suggestions": suggestions}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def reset_chat_api(request):
+    """Resets the chatbot conversation history."""
+    try:
+        instance = get_chatbot_instance()
+        if instance and hasattr(instance, 'history'):
+            instance.history.clear()
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
+    except Exception as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
