@@ -1,69 +1,77 @@
 import pytest
+from django.contrib.auth.models import User
 from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 from sales.models import Enquiry
 
 @pytest.fixture
-def api_client():
-    return APIClient()
+def auth_client():
+    client = APIClient()
+    user = User.objects.create_user(username="testuser", password="password")
+    refresh = RefreshToken.for_user(user)
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+    return client
 
 @pytest.mark.django_db
 class TestEnquiryAPIEdgeCases:
     
-    def test_valid_post_request(self, api_client):
-        # QA TestCase 1: Valid POST
+    def test_valid_post_request(self, auth_client):
+        # QA TestCase 1: Valid POST using frontend key 'id' mapped to 'enquiry_id'
         payload = {
-            "name": "ENQ-API-001",
-            "phone_no": "9999999999",
-            "vehicle_name": "R15"
+            "id": "ENQ-API-001",
+            "customer": "Rithwik",
+            "vehicle": "R15",
+            "temperature": "Hot",
+            "status": "Submitted",
+            "date": "2026-05-23",
+            "source": "Walk-in"
         }
-        res = api_client.post("/api/enquiry/", payload, format="json")
+        res = auth_client.post("/api/enquiry/create/", payload, format="json")
         assert res.status_code == 201
-        assert res.data["name"] == "ENQ-API-001"
+        assert res.data["enquiry_id"] == "ENQ-API-001"
+        assert res.data["customer"] == "Rithwik"
 
-    def test_missing_required_fields(self, api_client):
-        # QA TestCase 2: Missing 'name' which is the primary key
+    def test_missing_required_fields(self, auth_client):
+        # QA TestCase 2: Missing 'customer' field which is required
         payload = {
-            "phone_no": "9999999999",
-            "vehicle_name": "Yamaha"
+            "id": "ENQ-API-002",
+            "vehicle": "Yamaha",
+            "temperature": "Hot",
+            "status": "Submitted",
+            "date": "2026-05-23",
+            "source": "Walk-in"
         }
-        res = api_client.post("/api/enquiry/", payload, format="json")
+        res = auth_client.post("/api/enquiry/create/", payload, format="json")
         assert res.status_code == 400
-        assert "name" in res.data # Should flag field as required
+        assert "customer" in res.data # Should flag field as required
 
-    def test_invalid_field_format(self, api_client):
-        # QA TestCase 3: Data too long for constraint (phone limit is 10)
-        payload = {
-            "name": "ENQ-API-002",
-            "phone_no": "12345678901234567890" # 20 chars
-        }
-        res = api_client.post("/api/enquiry/", payload, format="json")
-        assert res.status_code == 400
-
-    def test_empty_request_body(self, api_client):
+    def test_empty_request_body(self, auth_client):
         # QA TestCase 4: Robustness against empty input
-        res = api_client.post("/api/enquiry/", {}, format="json")
+        res = auth_client.post("/api/enquiry/create/", {}, format="json")
         assert res.status_code == 400
 
-    def test_wrong_data_types(self, api_client):
-        # QA TestCase 5: Sending strings to DecimalField
-        payload = {
-            "name": "ENQ-API-003",
-            "down_payment": "Not a Number"
-        }
-        res = api_client.post("/api/enquiry/", payload, format="json")
-        assert res.status_code == 400
-        assert "down_payment" in res.data
-
-    def test_get_when_no_data_exists(self, api_client):
+    def test_get_when_no_data_exists(self, auth_client):
         # QA TestCase 6: Empty state arrays
-        res = api_client.get("/api/enquiry/")
+        res = auth_client.get("/api/enquiry/")
         assert res.status_code == 200
         assert len(res.data) == 0
 
-    def test_get_after_multiple_inserts(self, api_client):
+    def test_get_after_multiple_inserts(self, auth_client):
         # QA TestCase 7: Verification of returned list
-        Enquiry.objects.create(name="T1")
-        Enquiry.objects.create(name="T2")
-        res = api_client.get("/api/enquiry/")
+        Enquiry.objects.create(
+            enquiry_id="T1", customer="C1", vehicle="V1", 
+            temperature="Hot", status="Submitted", date="2026-05-23", source="Walk-in"
+        )
+        Enquiry.objects.create(
+            enquiry_id="T2", customer="C2", vehicle="V2", 
+            temperature="Warm", status="Submitted", date="2026-05-23", source="Phone"
+        )
+        res = auth_client.get("/api/enquiry/")
         assert res.status_code == 200
         assert len(res.data) == 2
+
+    def test_unauthenticated_request_fails(self):
+        # Verify that accessing protected endpoints without a token returns 401 Unauthorized
+        client = APIClient()
+        res = client.get("/api/enquiry/")
+        assert res.status_code == 401

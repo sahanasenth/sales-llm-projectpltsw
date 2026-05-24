@@ -27,7 +27,6 @@ def home(request):
 # Enquiry APIs
 # ─────────────────────────────────────────────
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def get_enquiries(request):
     enquiries = Enquiry.objects.all().order_by('-id')
     serializer = EnquirySerializer(enquiries, many=True)
@@ -36,7 +35,6 @@ def get_enquiries(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def create_enquiry(request):
 
     serializer = EnquirySerializer(data=request.data)
@@ -59,7 +57,6 @@ def create_enquiry(request):
 # Appointment APIs
 # ─────────────────────────────────────────────
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def get_appointments(request):
     appointments = Appointment.objects.all().order_by('-id')
     serializer = AppointmentSerializer(appointments, many=True)
@@ -68,7 +65,6 @@ def get_appointments(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def create_appointment(request):
 
     serializer = AppointmentSerializer(data=request.data)
@@ -91,7 +87,6 @@ def create_appointment(request):
 # Feedback APIs
 # ─────────────────────────────────────────────
 @api_view(['GET'])
-@permission_classes([AllowAny])
 def get_feedback(request):
     feedback_records = Feedback.objects.all().order_by('-id')
     serializer = FeedbackSerializer(feedback_records, many=True)
@@ -100,7 +95,6 @@ def get_feedback(request):
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def create_feedback(request):
 
     serializer = FeedbackSerializer(data=request.data)
@@ -123,7 +117,6 @@ def create_feedback(request):
 # Chat API
 # ─────────────────────────────────────────────
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def chat_api(request):
 
     query = request.data.get('query')
