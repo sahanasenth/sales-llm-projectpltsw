@@ -6,7 +6,10 @@ from .views import (
     create_appointment,
     get_feedback,
     create_feedback,
-    chat_api
+    chat_api,
+    health_api,
+    suggestions_api,
+    reset_chat_api
 )
 
 urlpatterns = [
@@ -20,4 +23,7 @@ urlpatterns = [
     path('feedback/create/', create_feedback, name='create_feedback'),
 
     path('chat/', chat_api, name='chat_api'),
+    path('health/', health_api, name='health_api'),
+    path('suggestions/', suggestions_api, name='suggestions_api'),
+    path('reset/', reset_chat_api, name='reset_chat_api'),
 ]
