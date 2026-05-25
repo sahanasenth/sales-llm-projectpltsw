@@ -27,7 +27,6 @@ _llm_ready = False
 
 
 def _load_llm() -> bool:
-    
     global _llm_tok, _llm_mdl, _llm_ready
     if _llm_ready:
         return True
@@ -199,16 +198,9 @@ def _generate_phrase(query: str, structured_facts: str, intent: str) -> str:
 
 
 warnings.filterwarnings("ignore")
-
 # ──────────────────────────────────────────────────────────────────────── CONFIG
 TOP_K       = 8
 INDEX_CACHE = "rag_index.pkl"
-
-CSV_FILES = {
-    "Enquiry"    : "sales_enquiry_dataset.csv",
-    "Appointment": "sales_appointment_dataset.csv",
-    "Feedback"   : "sales_feedback_dataset.csv",
-}
 
 
 INTENT_TO_SOURCE = {
@@ -229,7 +221,6 @@ INTENT_TO_SOURCE = {
     "summary"     : None,
     "list_all"    : None,
 }
-
 
 _KNOWN_NAMES_SET: set = set()
 
@@ -345,7 +336,7 @@ def detect_intent(query: str) -> tuple:
 def _extract_name_lower(query: str):
     """
     Extract customer names typed in lowercase using the DYNAMIC name set
-    loaded from the actual CSVs (no more hardcoded list).
+    loaded from the crm.
     """
     words = re.findall(r'\b\w+\b', query.lower())
     for w in words:
@@ -1090,128 +1081,20 @@ class IntelligentSalesChatbot:
 
 # ─────────────────────────────────────────────────────────── 7. DATA LOADING
 
-def load_datasets() -> dict:
-    """Return {source_name: pd.DataFrame} for each CSV."""
-    dfs = {}
-    for source, path in CSV_FILES.items():
-        if not os.path.exists(path):
-            print(f"  [WARN] {path} not found — skipping.")
-            continue
-        df = pd.read_csv(path)
-        df.columns      = [c.strip() for c in df.columns]
-        df["__source__"] = source
-        dfs[source]      = df
-        print(f"  OK {source:<12}: {len(df)} records")
-    if not dfs:
-        sys.exit("[ERROR] No CSV files found.")
-    return dfs
 
 
 def build_docs_per_source(dfs: dict) -> dict:
-    """Return {source_name: [rich_text, …]}."""
+    """Convert DataFrames from Django database into rich text documents."""
     docs = {}
     for src, df in dfs.items():
         docs[src] = [row_to_rich_text(row.to_dict(), src) for _, row in df.iterrows()]
     return docs
 
 
-def _cache_fresh(path: str, dfs: dict) -> bool:
-    if not os.path.exists(path):
-        return False
-    ct = os.path.getmtime(path)
-    return all(
-        not os.path.exists(p) or os.path.getmtime(p) <= ct
-        for p in CSV_FILES.values()
-    )
-
-
-# ──────────────────────────────────────────────────────────────── 8. CLI
-
-BANNER = """
-This is a Intelligent sales chatbot
-"""
-
-
-def run_cli(chatbot: IntelligentSalesChatbot):
-    print(BANNER)
-    while True:
-        try:
-            user_input = input("You: ").strip()
-        except (EOFError, KeyboardInterrupt):
-            print("\nGoodbye!"); break
-        if not user_input:
-            continue
-        low = user_input.lower()
-
-        if   low == "/quit":
-            print("Goodbye!"); break
-        elif low == "/llm":
-            chatbot.use_llm = not chatbot.use_llm
-            print(f"  [LLM generation: {'ON' if chatbot.use_llm else 'OFF'}]\n")
-        elif low == "/reset":
-            chatbot.history.clear()
-            print("  [History cleared]\n")
-        elif low == "/history":
-            if not chatbot.history:
-                print("  [No history yet]\n")
-            else:
-                for role, text in chatbot.history:
-                    print(f"  {role}: {text}")
-                print()
-        elif low == "/context":
-            chatbot.show_ctx = True
-            print("  [Context + intent shown for next query]\n")
-        elif low.startswith("/topk"):
-            try:
-                chatbot.top_k = int(user_input.split()[1])
-                print(f"  [Top-K set to {chatbot.top_k}]\n")
-            except (IndexError, ValueError):
-                print("  Usage: /topk 3\n")
-        else:
-            answer, elapsed, intent = chatbot.chat(user_input)
-            print(f"\nAssistant [{intent}]: {answer}")
-            print(f"  ({elapsed:.2f}s)\n")
-
-
-# ──────────────────────────────────────────────────────────────── MAIN
-
+# Main CLI function (kept for testing)
 def main():
-    global _KNOWN_NAMES_SET
-
-    print("\n[1/3] Loading datasets …")
-    dfs = load_datasets()
-
-    # Populate dynamic name set from all datasets
-    for src_df in dfs.values():
-        for col in src_df.columns:
-            if "name" in col.lower() and not col.startswith("__"):
-                _KNOWN_NAMES_SET.update(
-                    n for n in src_df[col].dropna().astype(str).unique()
-                    if n not in ("nan","None","")
-                )
-    print(f"  OK Known customer names: {sorted(_KNOWN_NAMES_SET)}")
-
-    print("\n[2/3] Building per-dataset retrievers …")
-    docs_per_source = build_docs_per_source(dfs)
-
-    if _cache_fresh(INDEX_CACHE, dfs):
-        print(f"  Loading from cache: {INDEX_CACHE}")
-        retriever = IntelligentRetriever.load(INDEX_CACHE)
-        print("  OK Cache loaded")
-    else:
-        retriever = IntelligentRetriever(dfs, docs_per_source)
-        retriever.save(INDEX_CACHE)
-        print(f"  OK Index saved to {INDEX_CACHE}")
-
-    print("\n[3/3] Starting up …")
-    print(f"  Device : {LLM_DEVICE}")
-    print(f"  Models  : {' → '.join(CHAT_MODELS)}")
-    import threading
-    threading.Thread(target=_load_llm, daemon=True).start()
-    print("  [LLM] Loading in background (ready in ~20-40 s) …\n")
-
-    chatbot = IntelligentSalesChatbot(retriever)
-    run_cli(chatbot)
+    print("\n[DB-Driven Chatbot] Initializing from Django models...\n")
+    print("Use get_chatbot_instance() from Django services instead.")
 
 
 if __name__ == "__main__":
