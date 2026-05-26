@@ -4,6 +4,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Enquiry, Appointment, Feedback
 from .serializers import EnquirySerializer, AppointmentSerializer, FeedbackSerializer
+from .services import (
+    process_chat_query,
+    get_chatbot_instance,
+    is_llm_enabled,
+    reset_chatbot_instance,
+)
 
 
 def home(request):
@@ -32,6 +38,7 @@ def create_enquiry(request):
     serializer = EnquirySerializer(data=data)
     if serializer.is_valid():
         serializer.save()
+        reset_chatbot_instance()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -57,6 +64,7 @@ def create_appointment(request):
     serializer = AppointmentSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
+        reset_chatbot_instance()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -82,12 +90,10 @@ def create_feedback(request):
     serializer = FeedbackSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
+        reset_chatbot_instance()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-from .services import process_chat_query, get_chatbot_instance
 
 @api_view(['POST'])
 def chat_api(request):
@@ -99,11 +105,16 @@ def chat_api(request):
 
     try:
         response_data = process_chat_query(query)
+        if response_data.get("status") != "success":
+            return Response({
+                "error": response_data.get("message", "Chatbot processing failed.")
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         # Return format expected by Platinum_Sales_Chatbot index.html
         return Response({
             "answer": response_data["response"],
-            "intent": response_data["metadata"]["intent"],
-            "elapsed": response_data["metadata"]["latency_seconds"]
+            "intent": response_data["intent"],
+            "elapsed": response_data["latency"]
         }, status=status.HTTP_200_OK)
     except Exception as exc:
         return Response({
@@ -120,6 +131,7 @@ def health_api(request):
         return Response({
             "status": "ok",
             "chatbot_ready": instance is not None,
+            "llm_enabled": is_llm_enabled(),
             "llm_ready": llm_ready
         }, status=status.HTTP_200_OK)
     except Exception as exc:

@@ -83,6 +83,39 @@ The application will be running at `http://127.0.0.1:8000/`.
 To ensure the API and database logic are functioning properly against edge-cases, run the comprehensive testing suite:
 
 ```bash
-pytest -v
+python -m pytest -q
 ```
 All tests should pass indicating that the backend APIs successfully catch missing fields, invalid types, and handle edge cases gracefully.
+
+### 9. Running Postman API Automation
+
+The Postman collection is automated with Newman and is stored at `CRM_Chatbot_APIs.postman_collection.json`.
+
+Install the Node test dependency once:
+
+```bash
+npm install
+```
+
+Prepare the local API database and director login used by the collection:
+
+```bash
+python manage.py migrate --noinput
+python create_test_users.py
+```
+
+Start Django in one terminal:
+
+```bash
+python manage.py runserver 127.0.0.1:8000
+```
+
+Run the Postman collection from another terminal in `backend/`:
+
+```bash
+npm run test:postman
+```
+
+This executes authentication, chatbot health/suggestions/reset/chat, CRM enquiry/appointment/feedback API checks, and a final chatbot query against an enquiry created during the same collection run. A Newman JSON result is written to `postman-results.json` for local review and is ignored by git.
+
+By default, chatbot API tests use fast structured RAG responses. To enable optional LLM rephrasing locally, set `ENABLE_LLM_REPHRASING=true` before starting Django.
