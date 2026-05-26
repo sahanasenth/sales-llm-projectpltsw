@@ -14,5 +14,10 @@ scikit-learn
 joblib
 openpyxl
 
+torch
+transformers
+sentence-transformers
+accelerate
+
 pytest==8.1.1
 pytest-django==4.8.0
