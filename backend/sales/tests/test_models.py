@@ -1,55 +1,50 @@
 import pytest
-from sales.models import Enquiry, Customer, Appointment, Feedback
+from sales.models import Enquiry, Appointment, Feedback
+from datetime import date
 
 @pytest.mark.django_db
 class TestSalesModels:
     
     def test_create_enquiry(self):
-        # Unit test to verify Enquiry model constraints and data save
+        """Unit test to verify Enquiry model constraints and data save."""
         enquiry = Enquiry.objects.create(
-            name="ENQ-001",
-            phone_no="9876543210",
-            vehicle_name="R15",
-            down_payment=5000.00
+            enquiry_id="ENQ001",
+            customer="John Doe",
+            vehicle="FZ-S",
+            temperature="Hot",
+            status="New Lead",
+            date=date(2026, 5, 26),
+            source="Walk-in"
         )
-        assert enquiry.name == "ENQ-001"
-        assert enquiry.phone_no == "9876543210"
-        assert enquiry.down_payment == 5000.00
-
-    def test_create_customer(self):
-        # Verify Customer links to Enquiry correctly
-        enquiry = Enquiry.objects.create(name="ENQ-002")
-        customer = Customer.objects.create(
-            name="John Doe",
-            phone_no="1234567890",
-            email="johndoe@example.com",
-            address="123 Main St",
-            enquiry=enquiry
-        )
-        assert customer.name == "John Doe"
-        assert customer.enquiry.name == "ENQ-002"
+        assert enquiry.enquiry_id == "ENQ001"
+        assert enquiry.customer == "John Doe"
+        assert enquiry.vehicle == "FZ-S"
+        assert enquiry.status == "New Lead"
 
     def test_create_appointment(self):
-        # Verify Appointment creation and relationships
-        enquiry = Enquiry.objects.create(name="ENQ-003")
+        """Verify Appointment creation."""
         appointment = Appointment.objects.create(
-            name="APT-001",
-            sales_enquiry_id=enquiry,
-            vehicle_name="FZ-X",
-            date="2026-05-19"
+            appointment_id="APP001",
+            customer="John Doe",
+            vehicle="FZ-S",
+            status="Scheduled",
+            date=date(2026, 5, 27),
+            time="10:00 AM"
         )
-        assert appointment.name == "APT-001"
-        assert appointment.sales_enquiry_id.name == "ENQ-003"
-        assert str(appointment.date) == "2026-05-19"
+        assert appointment.appointment_id == "APP001"
+        assert appointment.customer == "John Doe"
+        assert appointment.time == "10:00 AM"
 
     def test_create_feedback(self):
-        # Verify Feedback model
-        enquiry = Enquiry.objects.create(name="ENQ-004")
+        """Verify Feedback model."""
         feedback = Feedback.objects.create(
-            name="FB-001",
-            sales_enquiry_id=enquiry,
-            customer="Jane Doe",
-            vehicle_name="Fascino"
+            feedback_id="FB001",
+            enquiry_id="ENQ001",
+            customer="John Doe",
+            vehicle="FZ-S",
+            status="Submitted",
+            date=date(2026, 5, 28)
         )
-        assert feedback.name == "FB-001"
-        assert feedback.customer == "Jane Doe"
+        assert feedback.feedback_id == "FB001"
+        assert feedback.customer == "John Doe"
+        assert feedback.status == "Submitted"

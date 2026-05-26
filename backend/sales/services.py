@@ -11,7 +11,12 @@ llm_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.
 if llm_path not in sys.path:
     sys.path.insert(0, llm_path)
 
-import test as chatbot_test_module
+import importlib.util
+# Explicitly load our test.py using importlib to avoid collision with Python's built-in standard library 'test' module
+spec = importlib.util.spec_from_file_location("chatbot_test_module", os.path.join(llm_path, "test.py"))
+chatbot_test_module = importlib.util.module_from_spec(spec)
+sys.modules["test"] = chatbot_test_module
+spec.loader.exec_module(chatbot_test_module)
 
 _chatbot_instance = None
 _chatbot_lock = threading.Lock()

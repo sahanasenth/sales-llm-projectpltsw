@@ -102,8 +102,8 @@ def chat_api(request):
         # Return format expected by Platinum_Sales_Chatbot index.html
         return Response({
             "answer": response_data["response"],
-            "intent": response_data["metadata"]["intent"],
-            "elapsed": response_data["metadata"]["latency_seconds"]
+            "intent": response_data["intent"],
+            "elapsed": response_data["latency"]
         }, status=status.HTTP_200_OK)
     except Exception as exc:
         return Response({
