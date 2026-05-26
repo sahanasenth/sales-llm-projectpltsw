@@ -1,7 +1,6 @@
 import os
 import sys
 import pytest
-from rest_framework.test import APIClient
 from rest_framework import status
 from sales.models import Enquiry, Appointment, Feedback
 from datetime import date
@@ -18,10 +17,6 @@ def reset_chatbot_singleton():
     sales.services.reset_chatbot_instance()
     yield
     sales.services.reset_chatbot_instance()
-
-@pytest.fixture
-def api_client():
-    return APIClient()
 
 @pytest.fixture
 def seed_test_data():
@@ -90,10 +85,11 @@ class TestChatbotAPI:
         # RAG should extract the customer Dinesh and provide details in the answer
         assert "Dinesh" in response.data["answer"]
 
-    def test_chatbot_rebuilds_after_enquiry_create(self, api_client):
+    def test_chatbot_rebuilds_after_enquiry_create(self, api_client, auth_client):
         """Verify the chatbot sees CRM records created after initialisation."""
         health = api_client.get("/api/health/")
         assert health.status_code == status.HTTP_200_OK
+        sales_client = auth_client("sales_executive")
 
         payload = {
             "id": "ENQ999",
@@ -104,7 +100,7 @@ class TestChatbotAPI:
             "date": "2026-05-26",
             "source": "Postman",
         }
-        created = api_client.post("/api/enquiry/create/", payload, format="json")
+        created = sales_client.post("/api/enquiry/create/", payload, format="json")
         assert created.status_code == status.HTTP_201_CREATED
 
         response = api_client.post("/api/chat/", {"query": "Show ENQ999 full details"}, format="json")

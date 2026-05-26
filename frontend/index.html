@@ -2235,10 +2235,22 @@
 
       const API_BASE = "http://127.0.0.1:8000/api";
 
+      const getApiErrorMessage = async (response, fallbackMessage) => {
+        const data = await response.json().catch(() => ({}));
+        if (response.status === 403) {
+          return "Access denied. You don't have permission to access this resource.";
+        }
+        return data.detail || fallbackMessage;
+      };
+
       const Api = {
         async getEnquiries() {
           const response = await Auth.authFetch(`${API_BASE}/enquiry/`);
-          if (!response.ok) throw new Error("Failed to fetch enquiries");
+          if (!response.ok) {
+            throw new Error(
+              await getApiErrorMessage(response, "Failed to fetch enquiries"),
+            );
+          }
           return response.json();
         },
 
@@ -2247,14 +2259,25 @@
             method: "POST",
             body: JSON.stringify(payload),
           });
+          if (!response.ok) {
+            throw new Error(
+              await getApiErrorMessage(response, "Failed to save enquiry."),
+            );
+          }
           const data = await response.json();
-          if (!response.ok) throw new Error(JSON.stringify(data));
           return data;
         },
 
         async getAppointments() {
           const response = await Auth.authFetch(`${API_BASE}/appointment/`);
-          if (!response.ok) throw new Error("Failed to fetch appointments");
+          if (!response.ok) {
+            throw new Error(
+              await getApiErrorMessage(
+                response,
+                "Failed to fetch appointments",
+              ),
+            );
+          }
           return response.json();
         },
 
@@ -2266,14 +2289,25 @@
               body: JSON.stringify(payload),
             },
           );
+          if (!response.ok) {
+            throw new Error(
+              await getApiErrorMessage(
+                response,
+                "Failed to save appointment.",
+              ),
+            );
+          }
           const data = await response.json();
-          if (!response.ok) throw new Error(JSON.stringify(data));
           return data;
         },
 
         async getFeedback() {
           const response = await Auth.authFetch(`${API_BASE}/feedback/`);
-          if (!response.ok) throw new Error("Failed to fetch feedback");
+          if (!response.ok) {
+            throw new Error(
+              await getApiErrorMessage(response, "Failed to fetch feedback"),
+            );
+          }
           return response.json();
         },
 
@@ -2285,8 +2319,12 @@
               body: JSON.stringify(payload),
             },
           );
+          if (!response.ok) {
+            throw new Error(
+              await getApiErrorMessage(response, "Failed to save feedback."),
+            );
+          }
           const data = await response.json();
-          if (!response.ok) throw new Error(JSON.stringify(data));
           return data;
         },
       };
@@ -3596,7 +3634,10 @@
                 Router.navigate("appointments");
               } catch (error) {
                 console.error("Create appointment failed:", error);
-                Utils.toast("Failed to save appointment to server.", "error");
+                Utils.toast(
+                  error.message || "Failed to save appointment to server.",
+                  "error",
+                );
               }
             });
           }
@@ -3695,7 +3736,10 @@
               Router.navigate("sales-enquiries");
             } catch (error) {
               console.error("Create enquiry failed:", error);
-              Utils.toast("Failed to save enquiry to server.", "error");
+              Utils.toast(
+                error.message || "Failed to save enquiry to server.",
+                "error",
+              );
             }
           });
 

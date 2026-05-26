@@ -10,7 +10,7 @@ from .views import (
     health_api,
     suggestions_api,
     reset_chat_api,
-    director_dashboard_api,
+    UserRegistrationView
 )
 
 urlpatterns = [
@@ -31,10 +31,5 @@ urlpatterns = [
     path('suggestions/', suggestions_api, name='suggestions_api'),
 
     path('reset/', reset_chat_api, name='reset_chat_api'),
-
-    path(
-        'director/dashboard/',
-        director_dashboard_api,
-        name='director_dashboard_api'
-    ),
+    path('register/', UserRegistrationView.as_view(), name='user-registration')
 ]
