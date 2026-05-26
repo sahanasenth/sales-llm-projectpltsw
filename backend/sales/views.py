@@ -34,6 +34,7 @@ def home(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_enquiries(request):
     enquiries = Enquiry.objects.all().order_by('-id')
     serializer = EnquirySerializer(enquiries, many=True)
@@ -41,7 +42,9 @@ def get_enquiries(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_enquiry(request):
+@permission_classes([IsAuthenticated])
     data = request.data.copy()
 
     incoming_id = data.get('id')
@@ -60,6 +63,7 @@ def create_enquiry(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_appointments(request):
     appointments = Appointment.objects.all().order_by('-id')
     serializer = AppointmentSerializer(appointments, many=True)
@@ -67,6 +71,7 @@ def get_appointments(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_appointment(request):
     data = request.data.copy()
 
@@ -86,6 +91,7 @@ def create_appointment(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_feedback(request):
     feedback_records = Feedback.objects.all().order_by('-id')
     serializer = FeedbackSerializer(feedback_records, many=True)
@@ -93,6 +99,7 @@ def get_feedback(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def create_feedback(request):
     data = request.data.copy()
 
@@ -111,6 +118,7 @@ def create_feedback(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def chat_api(request):
     query = request.data.get('query')
     if not query:
@@ -157,6 +165,7 @@ def health_api(request):
         }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def suggestions_api(request):
     """Returns pre-defined query suggestions."""
     suggestions = [
@@ -178,6 +187,7 @@ def suggestions_api(request):
     return Response({"suggestions": suggestions}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def reset_chat_api(request):
     """Resets the chatbot conversation history."""
     try:
