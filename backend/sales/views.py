@@ -1,3 +1,18 @@
+from rest_framework.decorators import (
+    api_view,
+    permission_classes
+)
+
+from rest_framework.permissions import (
+    IsAuthenticated,
+    AllowAny
+)
+
+from .permissions import (
+    IsDirector,
+    IsSalesManager,
+    IsCRMUser
+)
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
