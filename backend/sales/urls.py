@@ -9,10 +9,12 @@ from .views import (
     chat_api,
     health_api,
     suggestions_api,
-    reset_chat_api
+    reset_chat_api,
+    director_dashboard_api,
 )
 
 urlpatterns = [
+
     path('enquiry/', get_enquiries, name='get_enquiries'),
     path('enquiry/create/', create_enquiry, name='create_enquiry'),
 
@@ -23,7 +25,16 @@ urlpatterns = [
     path('feedback/create/', create_feedback, name='create_feedback'),
 
     path('chat/', chat_api, name='chat_api'),
+
     path('health/', health_api, name='health_api'),
+
     path('suggestions/', suggestions_api, name='suggestions_api'),
+
     path('reset/', reset_chat_api, name='reset_chat_api'),
+
+    path(
+        'director/dashboard/',
+        director_dashboard_api,
+        name='director_dashboard_api'
+    ),
 ]
