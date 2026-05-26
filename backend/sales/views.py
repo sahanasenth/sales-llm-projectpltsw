@@ -1,24 +1,13 @@
-from rest_framework.decorators import (
-    api_view,
-    permission_classes
-)
-
-from rest_framework.permissions import (
-    IsAuthenticated,
-    AllowAny
-)
-
-from .permissions import (
-    IsDirector,
-    IsSalesManager,
-    IsCRMUser
-)
 from django.http import JsonResponse
-from rest_framework.decorators import api_view
-from rest_framework.decorators import permission_classes
-from rest_framework.response import Response
+
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 from .models import Enquiry, Appointment, Feedback
 from .serializers import (
     EnquirySerializer,
@@ -33,9 +22,12 @@ from .services import (
     is_llm_enabled,
     reset_chatbot_instance,
 )
-from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
-from .permissions import IsDirector, IsManager, IsSalesExecutive, IsManagerOrDirector
+from .permissions import (
+    IsDirector,
+    IsManager,
+    IsSalesExecutive,
+    IsManagerOrDirector,
+)
 
 
 def home(request):
@@ -55,12 +47,14 @@ def get_enquiries(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsSalesExecutive])
 def create_enquiry(request):
-@permission_classes([IsAuthenticated])
     data = request.data.copy()
 
     incoming_id = data.get('id')
     if not incoming_id:
-        return Response({"id": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"id": ["This field is required."]},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     data['enquiry_id'] = incoming_id
 
@@ -88,7 +82,10 @@ def create_appointment(request):
 
     incoming_id = data.get('id')
     if not incoming_id:
-        return Response({"id": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"id": ["This field is required."]},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     data['appointment_id'] = incoming_id
 
@@ -116,7 +113,10 @@ def create_feedback(request):
 
     incoming_id = data.get('id')
     if not incoming_id:
-        return Response({"id": ["This field is required."]}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"id": ["This field is required."]},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     data['feedback_id'] = incoming_id
 
@@ -128,46 +128,59 @@ def create_feedback(request):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def chat_api(request):
     query = request.data.get('query')
+
     if not query:
-        return Response({
-            "error": "Missing 'query' in request body."
-        }, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"error": "Missing 'query' in request body."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     try:
         response_data = process_chat_query(query)
-        if response_data.get("status") != "success":
-            return Response({
-                "error": response_data.get("message", "Chatbot processing failed.")
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Return format expected by Platinum_Sales_Chatbot index.html
+        if response_data.get("status") != "success":
+            return Response(
+                {"error": response_data.get("message", "Chatbot processing failed.")},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
         return Response({
             "answer": response_data["response"],
             "intent": response_data["intent"],
             "elapsed": response_data["latency"]
         }, status=status.HTTP_200_OK)
+
     except Exception as exc:
-        return Response({
-            "error": f"Internal Server Error: {str(exc)}"
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"error": f"Internal Server Error: {str(exc)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def health_api(request):
-    """Returns the health status of the chatbot."""
     try:
         instance = get_chatbot_instance()
-        import test as chatbot_test_module
-        llm_ready = getattr(chatbot_test_module, "_llm_ready", False)
+
+        try:
+            import test as chatbot_test_module
+            llm_ready = getattr(chatbot_test_module, "_llm_ready", False)
+        except Exception:
+            llm_ready = False
+
         return Response({
             "status": "ok",
             "chatbot_ready": instance is not None,
             "llm_enabled": is_llm_enabled(),
             "llm_ready": llm_ready
         }, status=status.HTTP_200_OK)
+
     except Exception as exc:
         return Response({
             "status": "error",
@@ -175,10 +188,10 @@ def health_api(request):
             "message": str(exc)
         }, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def suggestions_api(request):
-    """Returns pre-defined query suggestions."""
     suggestions = [
         "Show all enquiries",
         "Who gave bad feedback?",
@@ -195,27 +208,51 @@ def suggestions_api(request):
         "All completed appointments",
         "Payment type breakdown",
     ]
+
     return Response({"suggestions": suggestions}, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def reset_chat_api(request):
-    """Resets the chatbot conversation history."""
     try:
         instance = get_chatbot_instance()
+
         if instance and hasattr(instance, 'history'):
             instance.history.clear()
+
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
     except Exception as exc:
-        return Response({"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"error": str(exc)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsDirector])
+def director_dashboard_api(request):
+    return Response({
+        "message": "Director access granted",
+        "total_enquiries": Enquiry.objects.count(),
+        "total_appointments": Appointment.objects.count(),
+        "total_feedback": Feedback.objects.count(),
+    })
+
 
 class UserRegistrationView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
