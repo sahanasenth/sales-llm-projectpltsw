@@ -1,3 +1,18 @@
+from rest_framework.decorators import (
+    api_view,
+    permission_classes
+)
+
+from rest_framework.permissions import (
+    IsAuthenticated,
+    AllowAny
+)
+
+from .permissions import (
+    IsDirector,
+    IsSalesManager,
+    IsCRMUser
+)
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.decorators import permission_classes
@@ -40,6 +55,7 @@ def get_enquiries(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsSalesExecutive])
 def create_enquiry(request):
+@permission_classes([IsAuthenticated])
     data = request.data.copy()
 
     incoming_id = data.get('id')
@@ -113,6 +129,7 @@ def create_feedback(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def chat_api(request):
     query = request.data.get('query')
     if not query:
@@ -159,6 +176,7 @@ def health_api(request):
         }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def suggestions_api(request):
     """Returns pre-defined query suggestions."""
     suggestions = [
@@ -180,6 +198,7 @@ def suggestions_api(request):
     return Response({"suggestions": suggestions}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def reset_chat_api(request):
     """Resets the chatbot conversation history."""
     try:
