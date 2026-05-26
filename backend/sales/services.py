@@ -20,6 +20,62 @@ spec.loader.exec_module(chatbot_test_module)
 
 _chatbot_instance = None
 _chatbot_lock = threading.Lock()
+ENABLE_LLM_REPHRASING = os.getenv('ENABLE_LLM_REPHRASING', 'false').lower() in {
+    '1',
+    'true',
+    'yes',
+    'on',
+}
+
+ENQUIRY_COLUMNS = [
+    'ENQUIRY ID',
+    'Customer Name',
+    'Vehicle Name / Model',
+    'Enquiry Source',
+    'Enquiry Date',
+    'Status',
+    'Temperature',
+    'Phone Number',
+    'Email',
+    'Gender',
+    'Appointment Date',
+    'City / State',
+    'Customer Type',
+    'Payment Type',
+    'Test Ride Taken',
+]
+
+APPOINTMENT_COLUMNS = [
+    'Enquiry ID',
+    'Customer Name',
+    'Vehicle',
+    'Appointment Date',
+    'Time',
+    'Status',
+]
+
+FEEDBACK_COLUMNS = [
+    'Enquiry ID',
+    'Customer Name',
+    'Vehicle',
+    'Date',
+    'Feedback',
+    'Rating',
+]
+
+
+class EmptySalesChatbot:
+    """Fallback chatbot used when CRM tables are valid but contain no records."""
+
+    def __init__(self):
+        self.history = []
+        self.use_llm = False
+
+    def chat(self, raw_query: str) -> tuple:
+        answer = "No CRM records found yet. Add enquiries, appointments, or feedback and ask again."
+        self.history.append(("You", raw_query))
+        self.history.append(("Assistant", answer))
+        return answer, 0, "empty_crm"
 
 
 def fetch_crm_data_for_chatbot():
@@ -37,12 +93,11 @@ def fetch_crm_data_for_chatbot():
             'status': 'Status',
             'temperature': 'Temperature',
         })
-        for col in ['Phone Number', 'Email', 'Gender', 'Appointment Date', 
-                   'City / State', 'Customer Type', 'Payment Type', 'Test Ride Taken']:
+        for col in ENQUIRY_COLUMNS:
             if col not in df_enq.columns:
                 df_enq[col] = ''
     else:
-        df_enq = pd.DataFrame(columns=['ENQUIRY ID', 'Customer Name', ...])  # add all needed columns
+        df_enq = pd.DataFrame(columns=ENQUIRY_COLUMNS)
 
     # Appointment
     app_qs = Appointment.objects.all().values()
@@ -56,6 +111,8 @@ def fetch_crm_data_for_chatbot():
             'time': 'Time',
             'status': 'Status',
         })
+    else:
+        df_app = pd.DataFrame(columns=APPOINTMENT_COLUMNS)
 
     # Feedback
     fb_qs = Feedback.objects.all().values()
@@ -68,12 +125,25 @@ def fetch_crm_data_for_chatbot():
             'status': 'Feedback',
         })
         df_fb['Rating'] = 3  # placeholder
+    else:
+        df_fb = pd.DataFrame(columns=FEEDBACK_COLUMNS)
 
     return {
         "Enquiry": df_enq,
         "Appointment": df_app,
         "Feedback": df_fb
     }
+
+
+def reset_chatbot_instance():
+    """Force the next chat request to rebuild the retriever from current CRM data."""
+    global _chatbot_instance
+    with _chatbot_lock:
+        _chatbot_instance = None
+
+
+def is_llm_enabled():
+    return ENABLE_LLM_REPHRASING
 
 
 def get_chatbot_instance():
@@ -83,22 +153,33 @@ def get_chatbot_instance():
         if _chatbot_instance is None:
             print(" Building chatbot retriever from live CRM data...")
             dfs = fetch_crm_data_for_chatbot()
+            searchable_dfs = {
+                source: df
+                for source, df in dfs.items()
+                if not df.empty
+            }
+
+            if not searchable_dfs:
+                _chatbot_instance = EmptySalesChatbot()
+                print(" Chatbot ready with empty CRM fallback.")
+                return _chatbot_instance
             
             # Update known names
-            for df in dfs.values():
+            for df in searchable_dfs.values():
                 for col in df.columns:
                     if "name" in col.lower():
                         chatbot_test_module._KNOWN_NAMES_SET.update(
                             str(x) for x in df[col].dropna().unique() if str(x).strip()
                         )
             
-            docs = chatbot_test_module.build_docs_per_source(dfs)
-            retriever = chatbot_test_module.IntelligentRetriever(dfs, docs)
+            docs = chatbot_test_module.build_docs_per_source(searchable_dfs)
+            retriever = chatbot_test_module.IntelligentRetriever(searchable_dfs, docs)
             
-            if not chatbot_test_module._llm_ready:
+            if ENABLE_LLM_REPHRASING and not chatbot_test_module._llm_ready:
                 threading.Thread(target=chatbot_test_module._load_llm, daemon=True).start()
             
             _chatbot_instance = chatbot_test_module.IntelligentSalesChatbot(retriever)
+            _chatbot_instance.use_llm = ENABLE_LLM_REPHRASING
             print(" Chatbot ready with dynamic CRM data!")
     return _chatbot_instance
 

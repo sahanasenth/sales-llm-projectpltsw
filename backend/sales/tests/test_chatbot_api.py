@@ -13,6 +13,12 @@ chatbot_test_module = sys.modules["test"]
 # Mock the causal model loading function so that unit tests run fast and offline without downloading gigabytes of models
 chatbot_test_module._load_llm = lambda: False
 
+@pytest.fixture(autouse=True)
+def reset_chatbot_singleton():
+    sales.services.reset_chatbot_instance()
+    yield
+    sales.services.reset_chatbot_instance()
+
 @pytest.fixture
 def api_client():
     return APIClient()
@@ -83,6 +89,28 @@ class TestChatbotAPI:
         assert "elapsed" in response.data
         # RAG should extract the customer Dinesh and provide details in the answer
         assert "Dinesh" in response.data["answer"]
+
+    def test_chatbot_rebuilds_after_enquiry_create(self, api_client):
+        """Verify the chatbot sees CRM records created after initialisation."""
+        health = api_client.get("/api/health/")
+        assert health.status_code == status.HTTP_200_OK
+
+        payload = {
+            "id": "ENQ999",
+            "customer": "Postman QA",
+            "vehicle": "R15",
+            "temperature": "Hot",
+            "status": "New Lead",
+            "date": "2026-05-26",
+            "source": "Postman",
+        }
+        created = api_client.post("/api/enquiry/create/", payload, format="json")
+        assert created.status_code == status.HTTP_201_CREATED
+
+        response = api_client.post("/api/chat/", {"query": "Show ENQ999 full details"}, format="json")
+        assert response.status_code == status.HTTP_200_OK, f"Response: {response.content.decode()}"
+        assert "ENQ999" in response.data["answer"]
+        assert "Postman QA" in response.data["answer"]
 
     def test_reset_chat_api(self, api_client):
         """Verify the chat conversation reset endpoint."""
