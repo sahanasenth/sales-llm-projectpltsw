@@ -1,24 +1,8 @@
-from rest_framework.decorators import (
-    api_view,
-    permission_classes
-)
-
-from rest_framework.permissions import (
-    IsAuthenticated,
-    AllowAny
-)
-
-from .permissions import (
-    IsDirector,
-    IsSalesManager,
-    IsCRMUser
-)
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from django.http import JsonResponse
-from rest_framework.decorators import api_view
-from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
 from .models import Enquiry, Appointment, Feedback
 from .serializers import (
     EnquirySerializer,
@@ -26,12 +10,6 @@ from .serializers import (
     FeedbackSerializer,
     UserRegistrationSerializer,
     CustomTokenObtainPairSerializer,
-)
-from .services import (
-    process_chat_query,
-    get_chatbot_instance,
-    is_llm_enabled,
-    reset_chatbot_instance,
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -55,7 +33,8 @@ def get_enquiries(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsSalesExecutive])
 def create_enquiry(request):
-@permission_classes([IsAuthenticated])
+    from .services import reset_chatbot_instance
+
     data = request.data.copy()
 
     incoming_id = data.get('id')
@@ -84,6 +63,8 @@ def get_appointments(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsManager])
 def create_appointment(request):
+    from .services import reset_chatbot_instance
+
     data = request.data.copy()
 
     incoming_id = data.get('id')
@@ -112,6 +93,8 @@ def get_feedback(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsSalesExecutive])
 def create_feedback(request):
+    from .services import reset_chatbot_instance
+
     data = request.data.copy()
 
     incoming_id = data.get('id')
@@ -131,6 +114,8 @@ def create_feedback(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def chat_api(request):
+    from .services import process_chat_query
+
     query = request.data.get('query')
     if not query:
         return Response({
@@ -159,6 +144,8 @@ def chat_api(request):
 def health_api(request):
     """Returns the health status of the chatbot."""
     try:
+        from .services import get_chatbot_instance, is_llm_enabled
+
         instance = get_chatbot_instance()
         import test as chatbot_test_module
         llm_ready = getattr(chatbot_test_module, "_llm_ready", False)
@@ -202,6 +189,8 @@ def suggestions_api(request):
 def reset_chat_api(request):
     """Resets the chatbot conversation history."""
     try:
+        from .services import get_chatbot_instance
+
         instance = get_chatbot_instance()
         if instance and hasattr(instance, 'history'):
             instance.history.clear()
