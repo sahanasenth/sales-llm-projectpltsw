@@ -198,6 +198,17 @@ def reset_chat_api(request):
     except Exception as exc:
         return Response({"error": str(exc)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['GET'])
+@permission_classes([IsDirector])
+def director_dashboard_api(request):
+    return Response({
+        "message": "Director access granted",
+        "total_enquiries": Enquiry.objects.count(),
+        "total_appointments": Appointment.objects.count(),
+        "total_feedback": Feedback.objects.count(),
+    })
+
 class UserRegistrationView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)

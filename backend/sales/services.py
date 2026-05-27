@@ -5,21 +5,9 @@ from datetime import datetime
 import pandas as pd
 from .models import Enquiry, Appointment, Feedback
 
-# Add LLM module to path
-llm_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 
-                                      'llm', 'Platinum_Sales_Chatbot-main'))
-if llm_path not in sys.path:
-    sys.path.insert(0, llm_path)
-
-import importlib.util
-# Explicitly load our test.py using importlib to avoid collision with Python's built-in standard library 'test' module
-spec = importlib.util.spec_from_file_location("chatbot_test_module", os.path.join(llm_path, "test.py"))
-chatbot_test_module = importlib.util.module_from_spec(spec)
-sys.modules["test"] = chatbot_test_module
-spec.loader.exec_module(chatbot_test_module)
-
 _chatbot_instance = None
 _chatbot_lock = threading.Lock()
+_chatbot_test_module = None
 ENABLE_LLM_REPHRASING = os.getenv('ENABLE_LLM_REPHRASING', 'false').lower() in {
     '1',
     'true',
@@ -62,6 +50,32 @@ FEEDBACK_COLUMNS = [
     'Feedback',
     'Rating',
 ]
+
+
+def _get_chatbot_test_module():
+    global _chatbot_test_module
+
+    if _chatbot_test_module is None:
+        import importlib.util
+
+        llm_path = os.path.abspath(os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            'llm',
+            'Platinum_Sales_Chatbot-main',
+        ))
+        if llm_path not in sys.path:
+            sys.path.insert(0, llm_path)
+
+        spec = importlib.util.spec_from_file_location(
+            "chatbot_test_module",
+            os.path.join(llm_path, "test.py"),
+        )
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["test"] = module
+        spec.loader.exec_module(module)
+        _chatbot_test_module = module
+
+    return _chatbot_test_module
 
 
 class EmptySalesChatbot:
@@ -152,6 +166,7 @@ def get_chatbot_instance():
     with _chatbot_lock:
         if _chatbot_instance is None:
             print(" Building chatbot retriever from live CRM data...")
+            chatbot_test_module = _get_chatbot_test_module()
             dfs = fetch_crm_data_for_chatbot()
             searchable_dfs = {
                 source: df
