@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sales', '0002_alter_appointment_table_alter_enquiry_table_and_more'),
+        ('sales', '0002_alter_user_options_alter_appointment_table_and_more'),
     ]
 
     operations = [

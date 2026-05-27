@@ -1,13 +1,8 @@
-from django.http import JsonResponse
-
-from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
+from django.http import JsonResponse
 from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from rest_framework_simplejwt.views import TokenObtainPairView
-
+from rest_framework import status
 from .models import Enquiry, Appointment, Feedback
 from .serializers import (
     EnquirySerializer,
@@ -16,18 +11,9 @@ from .serializers import (
     UserRegistrationSerializer,
     CustomTokenObtainPairSerializer,
 )
-from .services import (
-    process_chat_query,
-    get_chatbot_instance,
-    is_llm_enabled,
-    reset_chatbot_instance,
-)
-from .permissions import (
-    IsDirector,
-    IsManager,
-    IsSalesExecutive,
-    IsManagerOrDirector,
-)
+from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .permissions import IsDirector, IsManager, IsSalesExecutive, IsManagerOrDirector
 
 
 def home(request):
@@ -47,6 +33,8 @@ def get_enquiries(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsSalesExecutive])
 def create_enquiry(request):
+    from .services import reset_chatbot_instance
+
     data = request.data.copy()
 
     incoming_id = data.get('id')
@@ -78,6 +66,8 @@ def get_appointments(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsManager])
 def create_appointment(request):
+    from .services import reset_chatbot_instance
+
     data = request.data.copy()
 
     incoming_id = data.get('id')
@@ -109,6 +99,8 @@ def get_feedback(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated, IsSalesExecutive])
 def create_feedback(request):
+    from .services import reset_chatbot_instance
+
     data = request.data.copy()
 
     incoming_id = data.get('id')
@@ -132,6 +124,8 @@ def create_feedback(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def chat_api(request):
+    from .services import process_chat_query
+
     query = request.data.get('query')
 
     if not query:
@@ -166,6 +160,8 @@ def chat_api(request):
 @permission_classes([AllowAny])
 def health_api(request):
     try:
+        from .services import get_chatbot_instance, is_llm_enabled
+
         instance = get_chatbot_instance()
 
         try:
@@ -216,6 +212,8 @@ def suggestions_api(request):
 @permission_classes([IsAuthenticated])
 def reset_chat_api(request):
     try:
+        from .services import get_chatbot_instance
+
         instance = get_chatbot_instance()
 
         if instance and hasattr(instance, 'history'):
@@ -240,6 +238,17 @@ def director_dashboard_api(request):
         "total_feedback": Feedback.objects.count(),
     })
 
+
+
+@api_view(['GET'])
+@permission_classes([IsDirector])
+def director_dashboard_api(request):
+    return Response({
+        "message": "Director access granted",
+        "total_enquiries": Enquiry.objects.count(),
+        "total_appointments": Appointment.objects.count(),
+        "total_feedback": Feedback.objects.count(),
+    })
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
