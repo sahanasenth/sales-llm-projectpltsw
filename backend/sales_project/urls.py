@@ -37,12 +37,14 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from sales.views import home
+from sales.views import home, MyTokenObtainPairView
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from sales.serializers import MyTokenRefreshSerializer
+from rest_framework_simplejwt.views import TokenRefreshView as _TokenRefreshView
+
+
+class MyTokenRefreshView(_TokenRefreshView):
+    serializer_class = MyTokenRefreshSerializer
 
 urlpatterns = [
     path('', home),
@@ -51,7 +53,7 @@ urlpatterns = [
 
     path('api/', include('sales.urls')),
 
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
 
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/refresh/', MyTokenRefreshView.as_view(), name='token_refresh'),
 ]
