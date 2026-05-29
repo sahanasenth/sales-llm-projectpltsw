@@ -200,19 +200,55 @@ def get_chatbot_instance():
 
 
 def process_chat_query(query: str) -> dict:
-    """Main function called from views.py"""
     try:
+        lower_query = query.lower()
+
+        injection_keywords = [
+            "ignore previous", "disregard", "system prompt", "reveal prompt", 
+            "bypass", "hack", "hack system","you are now", "act as", "forget instructions",
+            "ignore all instructions","developer mode"
+        ]
+        if any(keyword in lower_query for keyword in injection_keywords):
+            return {
+                "status": "error",
+                "message": "Security alert: Unsafe or restricted prompt detected."
+            }
+
+        harmful_keywords = [
+            "delete database", "drop table", "select * from", 
+            "shutdown", "rm -rf"
+        ]
+        if any(keyword in lower_query for keyword in harmful_keywords):
+            return {
+                "status": "error",
+                "message": "Security alert: Action not permitted."
+            }
+
         chatbot = get_chatbot_instance()
         answer, elapsed, intent = chatbot.chat(query)
-        
+
+        lower_answer = str(answer).lower()
+
+        leakage_keywords = [
+            "traceback", "api_key", "secret_key", "django.db", 
+            "psycopg2", "password"
+        ]
+        if any(keyword in lower_answer for keyword in leakage_keywords):
+            return {
+                "status": "error",
+                "message": "Security alert: Response blocked due to sensitive content."
+            }
+
         return {
             "status": "success",
             "response": answer,
             "intent": intent,
             "latency": round(elapsed, 3)
         }
+        
     except Exception as e:
+
         return {
             "status": "error",
-            "message": str(e)
+            "message": "An unexpected error occurred while processing your request."
         }
