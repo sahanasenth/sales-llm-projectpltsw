@@ -127,12 +127,34 @@ def chat_api(request):
     from .services import process_chat_query
 
     query = request.data.get('query')
-
+   
     if not query:
         return Response(
             {"error": "Missing 'query' in request body."},
-            status=status.HTTP_400_BAD_REQUEST
+        status=status.HTTP_400_BAD_REQUEST
         )
+
+    if not isinstance(query, str):
+        return Response(
+             {"error": "Query must be a string."},
+        status=status.HTTP_400_BAD_REQUEST
+        )
+
+    query = query.strip()
+
+    if not query:
+        return Response(
+            {"error": "Query cannot be empty or whitespace only."},
+        status=status.HTTP_400_BAD_REQUEST
+        )
+
+    MAX_QUERY_LENGTH = 500
+
+    if len(query) > MAX_QUERY_LENGTH:
+        return Response(
+             {"error": f"Query exceeds maximum length of {MAX_QUERY_LENGTH} characters."},
+        status=status.HTTP_400_BAD_REQUEST
+        )    
 
     try:
         response_data = process_chat_query(query)
@@ -150,11 +172,12 @@ def chat_api(request):
         }, status=status.HTTP_200_OK)
 
     except Exception as exc:
-        return Response(
-            {"error": f"Internal Server Error: {str(exc)}"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        print(f"Chat error: {exc}")
 
+        return Response(
+            {"error": "An unexpected error occurred while processing your request."},
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -238,17 +261,6 @@ def director_dashboard_api(request):
         "total_feedback": Feedback.objects.count(),
     })
 
-
-
-@api_view(['GET'])
-@permission_classes([IsDirector])
-def director_dashboard_api(request):
-    return Response({
-        "message": "Director access granted",
-        "total_enquiries": Enquiry.objects.count(),
-        "total_appointments": Appointment.objects.count(),
-        "total_feedback": Feedback.objects.count(),
-    })
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
