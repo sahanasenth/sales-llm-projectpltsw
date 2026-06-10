@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save
@@ -28,6 +29,14 @@ def ensure_profile(sender, instance, created, **kwargs):
             # Avoid failing user creation for legacy installs; admin can create profile later
             pass
 
+
+class User(AbstractUser):
+    ROLE_CHOICES = (
+        ('director', 'Director'),
+        ('manager', 'Manager'),
+        ('sales_executive', 'Sales Executive'),
+    )
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='sales_executive')
 
 class Enquiry(models.Model):
     enquiry_id = models.CharField(max_length=20, unique=True)

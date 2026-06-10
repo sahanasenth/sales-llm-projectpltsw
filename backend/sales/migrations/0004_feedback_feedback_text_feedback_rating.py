@@ -7,6 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('sales', '0003_profile'),
+        ('sales', '0003_alter_user_options'),
     ]
 
     operations = [

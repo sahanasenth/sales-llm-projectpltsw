@@ -1,79 +1,70 @@
-import pytest
-from rest_framework.test import APIClient
-from django.contrib.auth import get_user_model
-from sales.models import Enquiry, Profile
+from datetime import date
 
-@pytest.fixture
-def authenticated_client():
-    User = get_user_model()
-    user = User.objects.create_user(username="salesexecutive", password="salespassword")
-    profile = Profile.objects.get(user=user)
-    profile.role = 'sales'
-    profile.save()
-    
-    client = APIClient()
-    client.force_authenticate(user=user)
-    return client
+import pytest
+from rest_framework import status
+
+from sales.models import Enquiry
+
 
 @pytest.mark.django_db
 class TestEnquiryAPIEdgeCases:
-    
-    def test_valid_post_request(self, authenticated_client):
-        # Valid POST request with current model fields
+    def test_valid_post_request(self, auth_client):
+        client = auth_client("sales_executive")
         payload = {
-            "id": "ENQ-API-001",
-            "customer": "John Doe",
-            "vehicle": "Yamaha R15",
+            "id": "ENQ001",
+            "customer": "Rithwik",
+            "vehicle": "FZ-S",
             "temperature": "Hot",
             "status": "New Lead",
-            "date": "2026-05-28",
+            "date": "2026-05-26",
             "source": "Walk-in"
         }
-        res = authenticated_client.post("/api/enquiry/create/", payload, format="json")
-        assert res.status_code == 201
-        assert res.data["enquiry_id"] == "ENQ-API-001"
-        assert res.data["customer"] == "John Doe"
+        res = client.post("/api/enquiry/create/", payload, format="json")
+        assert res.status_code == status.HTTP_201_CREATED
+        assert res.data["customer"] == "Rithwik"
+        assert res.data["enquiry_id"] == "ENQ001"
 
-    def test_missing_required_fields(self, authenticated_client):
-        # Missing 'id' which is required by create_enquiry view
+    def test_missing_required_fields(self, auth_client):
+        client = auth_client("sales_executive")
         payload = {
-            "customer": "John Doe",
-            "vehicle": "Yamaha R15",
-            "temperature": "Hot",
-            "status": "New Lead",
-            "date": "2026-05-28",
-            "source": "Walk-in"
+            "customer": "Rithwik",
+            "vehicle": "FZ-S"
         }
-        res = authenticated_client.post("/api/enquiry/create/", payload, format="json")
-        assert res.status_code == 400
+        res = client.post("/api/enquiry/create/", payload, format="json")
+        assert res.status_code == status.HTTP_400_BAD_REQUEST
         assert "id" in res.data
 
-    def test_get_when_no_data_exists(self, authenticated_client):
-        # Verify empty state
-        res = authenticated_client.get("/api/enquiry/")
-        assert res.status_code == 200
+    def test_empty_request_body(self, auth_client):
+        client = auth_client("sales_executive")
+        res = client.post("/api/enquiry/create/", {}, format="json")
+        assert res.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_get_when_no_data_exists(self, auth_client):
+        client = auth_client("director")
+        res = client.get("/api/enquiry/")
+        assert res.status_code == status.HTTP_200_OK
         assert len(res.data) == 0
 
-    def test_get_after_multiple_inserts(self, authenticated_client):
-        # Verify retrieving list
+    def test_get_after_multiple_inserts(self, auth_client):
+        client = auth_client("director")
         Enquiry.objects.create(
-            enquiry_id="T1",
-            customer="John Doe",
-            vehicle="R15",
+            enquiry_id="ENQ001",
+            customer="T1",
+            vehicle="FZ-S",
             temperature="Hot",
             status="New Lead",
-            date="2026-05-28",
+            date=date(2026, 5, 26),
             source="Walk-in"
         )
         Enquiry.objects.create(
-            enquiry_id="T2",
-            customer="Jane Doe",
-            vehicle="FZ",
-            temperature="Warm",
-            status="Closed",
-            date="2026-05-28",
-            source="Online"
+            enquiry_id="ENQ002",
+            customer="T2",
+            vehicle="FZ-S",
+            temperature="Hot",
+            status="New Lead",
+            date=date(2026, 5, 26),
+            source="Walk-in"
         )
-        res = authenticated_client.get("/api/enquiry/")
-        assert res.status_code == 200
+        res = client.get("/api/enquiry/")
+        assert res.status_code == status.HTTP_200_OK
         assert len(res.data) == 2

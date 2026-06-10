@@ -4,7 +4,8 @@ from django.db.models import deletion
 
 
 def create_profiles(apps, schema_editor):
-    User = apps.get_model('auth', 'User')
+    app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+    User = apps.get_model(app_label, model_name)
     Profile = apps.get_model('sales', 'Profile')
 
     for user in User.objects.all().iterator():
@@ -20,7 +21,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('sales', '0002_alter_appointment_table_alter_enquiry_table_and_more'),
+        ('sales', '0002_alter_user_options_alter_appointment_table_and_more'),
     ]
 
     operations = [

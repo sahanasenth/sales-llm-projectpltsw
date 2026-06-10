@@ -1,8 +1,7 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 
-from .models import Enquiry, Appointment, Feedback, Profile
+from .models import User, Enquiry, Appointment, Feedback, Profile
 
 
 class ProfileInline(admin.StackedInline):
@@ -11,16 +10,18 @@ class ProfileInline(admin.StackedInline):
     verbose_name_plural = 'profile'
 
 
-class CustomUserAdmin(DjangoUserAdmin):
+class CustomUserAdmin(UserAdmin):
+    model = User
     inlines = (ProfileInline,)
-    list_display = ('username', 'email', 'get_role', 'is_staff')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'role', 'is_staff')
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('role',)}),
+    )
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        (None, {'fields': ('role',)}),
+    )
 
-    def get_role(self, obj):
-        return getattr(getattr(obj, 'profile', None), 'role', '')
-    get_role.short_description = 'Role'
 
-
-admin.site.unregister(User)
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Enquiry)
 admin.site.register(Appointment)

@@ -1,0 +1,4 @@
+node_modules/
+backend/postman-results.json
+__pycache__/
+*.py[cod]

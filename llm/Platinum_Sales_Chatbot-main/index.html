@@ -580,9 +580,12 @@
           if (!r.ok) throw new Error();
           const d = await r.json();
           const ready = d.chatbot_ready;
+          const llmEnabled = d.llm_enabled !== false;
           statusPill.className = "status-pill " + (ready ? "ready" : "error");
           statusText.textContent = ready
-            ? d.llm_ready
+            ? !llmEnabled
+              ? "RAG ready"
+              : d.llm_ready
               ? "LLM + RAG ready"
               : "RAG ready (LLM loading…)"
             : d.init_error || "Initialising…";
