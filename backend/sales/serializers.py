@@ -6,7 +6,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Enquiry, Appointment, Feedback
 from .permissions import get_user_role
 
-
 User = get_user_model()
 
 
@@ -57,6 +56,7 @@ class MyTokenRefreshSerializer(TokenRefreshSerializer):
 
 
 class EnquirySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Enquiry
         fields = '__all__'
@@ -64,29 +64,41 @@ class EnquirySerializer(serializers.ModelSerializer):
     def validate_temperature(self, value):
         allowed = ['Hot', 'Warm', 'Cold']
         if value not in allowed:
-            raise serializers.ValidationError("Temperature must be Hot, Warm, or Cold.")
+            raise serializers.ValidationError(
+                "Temperature must be Hot, Warm, or Cold."
+            )
         return value
 
     def validate_status(self, value):
         allowed = ['Submitted', 'Draft', 'Closed', 'New Lead']
         if value not in allowed:
-            raise serializers.ValidationError("Invalid enquiry status.")
+            raise serializers.ValidationError(
+                "Invalid enquiry status."
+            )
         return value
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Appointment
         fields = '__all__'
 
     def validate_status(self, value):
-        allowed = ['Scheduled', 'Pending', 'Completed']
+        allowed = [
+            'Scheduled',
+            'Pending',
+            'Completed'
+        ]
         if value not in allowed:
-            raise serializers.ValidationError("Invalid appointment status.")
+            raise serializers.ValidationError(
+                "Invalid appointment status."
+            )
         return value
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Feedback
         fields = '__all__'
@@ -106,11 +118,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ('username', 'password', 'email', 'first_name', 'last_name', 'role')
 
     def create(self, validated_data):
-        return User.objects.create_user(
+        user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
             email=validated_data.get('email', ''),
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
-            role=validated_data.get('role', 'sales_executive'),
+            role=validated_data.get('role', 'sales_executive')
         )
+        return user

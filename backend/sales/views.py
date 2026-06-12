@@ -21,17 +21,13 @@ from .serializers import (
     AppointmentSerializer,
     EnquirySerializer,
     FeedbackSerializer,
-    MyTokenObtainPairSerializer,
+    CustomTokenObtainPairSerializer,
     UserRegistrationSerializer,
 )
 
 
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
-
-
-class CustomTokenObtainPairView(MyTokenObtainPairView):
-    pass
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 def home(request):
@@ -200,6 +196,7 @@ def chat_api(request):
     from .services import process_chat_query
 
     query = request.data.get('query')
+
     if not query:
         return Response(
             {"error": "Missing 'query' in request body."},
@@ -307,6 +304,7 @@ def reset_chat_api(request):
         from .services import get_chatbot_instance
 
         instance = get_chatbot_instance()
+
         if instance and hasattr(instance, 'history'):
             instance.history.clear()
 

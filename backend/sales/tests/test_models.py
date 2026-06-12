@@ -1,13 +1,11 @@
 from datetime import date
-
 import pytest
 from django.contrib.auth import get_user_model
-
 from sales.models import Appointment, Enquiry, Feedback, Profile
-
 
 @pytest.mark.django_db
 class TestSalesModels:
+
     def test_create_profile(self):
         User = get_user_model()
         user = User.objects.create_user(username="testuser", password="testpassword")
@@ -18,6 +16,7 @@ class TestSalesModels:
         assert profile.role == 'director'
 
     def test_create_enquiry(self):
+        """Unit test to verify Enquiry model constraints and data save."""
         enquiry = Enquiry.objects.create(
             enquiry_id="ENQ001",
             customer="John Doe",
@@ -33,6 +32,7 @@ class TestSalesModels:
         assert enquiry.status == "New Lead"
 
     def test_create_appointment(self):
+        """Verify Appointment creation."""
         appointment = Appointment.objects.create(
             appointment_id="APP001",
             customer="John Doe",
@@ -46,6 +46,7 @@ class TestSalesModels:
         assert appointment.time == "10:00 AM"
 
     def test_create_feedback(self):
+        """Verify Feedback model."""
         feedback = Feedback.objects.create(
             feedback_id="FB001",
             enquiry_id="ENQ001",

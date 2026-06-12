@@ -1,14 +1,13 @@
 from datetime import date
-
 import pytest
 from rest_framework import status
-
 from sales.models import Enquiry
-
 
 @pytest.mark.django_db
 class TestEnquiryAPIEdgeCases:
+
     def test_valid_post_request(self, auth_client):
+        """QA TestCase 1: Valid POST to Enquiry creation."""
         client = auth_client("sales_executive")
         payload = {
             "id": "ENQ001",
@@ -25,6 +24,7 @@ class TestEnquiryAPIEdgeCases:
         assert res.data["enquiry_id"] == "ENQ001"
 
     def test_missing_required_fields(self, auth_client):
+        """QA TestCase 2: Missing 'id' which is required for identification."""
         client = auth_client("sales_executive")
         payload = {
             "customer": "Rithwik",
@@ -32,20 +32,23 @@ class TestEnquiryAPIEdgeCases:
         }
         res = client.post("/api/enquiry/create/", payload, format="json")
         assert res.status_code == status.HTTP_400_BAD_REQUEST
-        assert "id" in res.data
+        assert "id" in res.data  # Should flag field as required
 
     def test_empty_request_body(self, auth_client):
+        """QA TestCase 4: Robustness against empty input."""
         client = auth_client("sales_executive")
         res = client.post("/api/enquiry/create/", {}, format="json")
         assert res.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_get_when_no_data_exists(self, auth_client):
+        """QA TestCase 6: Verify empty state array."""
         client = auth_client("director")
         res = client.get("/api/enquiry/")
         assert res.status_code == status.HTTP_200_OK
         assert len(res.data) == 0
 
     def test_get_after_multiple_inserts(self, auth_client):
+        """QA TestCase 7: Verification of returned enquiry list."""
         client = auth_client("director")
         Enquiry.objects.create(
             enquiry_id="ENQ001",

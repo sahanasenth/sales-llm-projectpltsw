@@ -24,11 +24,17 @@ def role_in(user, allowed_roles):
 
 
 class IsDirector(BasePermission):
+    """
+    Allows access only to users with the 'director' role.
+    """
     def has_permission(self, request, view):
         return role_in(request.user, ('director',))
 
 
 class IsManager(BasePermission):
+    """
+    Allows access only to users with the 'manager' role.
+    """
     def has_permission(self, request, view):
         return role_in(request.user, ('manager', 'salesmanager'))
 
@@ -38,11 +44,17 @@ class IsSalesManager(IsManager):
 
 
 class IsSalesExecutive(BasePermission):
+    """
+    Allows access only to users with the 'sales_executive' role.
+    """
     def has_permission(self, request, view):
         return role_in(request.user, ('sales_executive', 'sales'))
 
 
 class IsManagerOrDirector(BasePermission):
+    """
+    Allows access to users with 'manager' or 'director' role.
+    """
     def has_permission(self, request, view):
         return role_in(request.user, ('manager', 'salesmanager', 'director'))
 

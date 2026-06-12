@@ -18,7 +18,6 @@ from .views import (
     suggestions_api,
 )
 
-
 urlpatterns = [
     path('auth/me/', current_user, name='current_user'),
     path('enquiry/', get_enquiries, name='get_enquiries'),
@@ -30,8 +29,11 @@ urlpatterns = [
     path('director/revenue/', get_revenue_report, name='revenue_report'),
     path('admin/logs/', get_audit_logs, name='audit_logs'),
     path('chat/', chat_api, name='chat_api'),
+
     path('health/', health_api, name='health_api'),
+
     path('suggestions/', suggestions_api, name='suggestions_api'),
+
     path('reset/', reset_chat_api, name='reset_chat_api'),
     path('director/dashboard/', director_dashboard_api, name='director_dashboard_api'),
     path('register/', UserRegistrationView.as_view(), name='user-registration'),

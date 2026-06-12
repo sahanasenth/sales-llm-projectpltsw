@@ -250,7 +250,6 @@ def process_chat_query(query: str) -> dict:
         }
         
     except Exception as e:
-
         return {
             "status": "error",
             "message": "An unexpected error occurred while processing your request."
