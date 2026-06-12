@@ -337,6 +337,9 @@
       }
 
       .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         height: 44px;
         border-radius: 12px;
         padding: 0 16px;
@@ -345,6 +348,7 @@
         color: var(--text);
         font-weight: 600;
         cursor: pointer;
+        text-decoration: none;
       }
       .btn-primary {
         border-color: transparent;
@@ -1531,198 +1535,10 @@
     </div>
 
     <div class="app-shell" id="appShell">
-      <aside class="sidebar" id="sidebar">
-        <div class="brand">
-          <div class="brand-badge">SC</div>
-          <div class="brand-copy">
-            <h1>Sales Command</h1>
-            <p>Professional CRM Workspace</p>
-          </div>
-        </div>
-
-        <div>
-          <div class="nav-group-title">Workspace</div>
-          <div class="nav-menu">
-            <div
-              class="nav-link"
-              data-nav="dashboard"
-              role="button"
-              tabindex="0"
-            >
-              <span class="nav-icon">⌂</span>
-              <span class="nav-text">Dashboard</span>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="nav-group-title">Sales</div>
-          <div class="nav-menu">
-            <div
-              class="nav-link active"
-              data-nav="sales-enquiries"
-              role="button"
-              tabindex="0"
-            >
-              <span class="nav-icon">▣</span>
-              <span class="nav-text">Sales Enquiries</span>
-            </div>
-
-            <div
-              class="nav-link"
-              data-nav="enquiry-form"
-              role="button"
-              tabindex="0"
-            >
-              <span class="nav-icon">✎</span>
-              <span class="nav-text">Enquiry Form</span>
-            </div>
-
-            <div
-              class="nav-link"
-              data-nav="appointments"
-              role="button"
-              tabindex="0"
-            >
-              <span class="nav-icon">🗓</span>
-              <span class="nav-text">Appointment Booking</span>
-            </div>
-
-            <div
-              class="nav-link"
-              data-nav="feedback"
-              role="button"
-              tabindex="0"
-            >
-              <span class="nav-icon">☰</span>
-              <span class="nav-text">Sales Feedback</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="sidebar-footer">
-          <h3>Module Scope</h3>
-          <p>Enquiries · Appointments · Feedback · Modular architecture</p>
-        </div>
-      </aside>
+      <aside class="sidebar" id="sidebar"></aside>
       <div class="main">
-        <header class="topbar" id="topbar">
-          <div class="topbar-left">
-            <button
-              class="icon-btn"
-              id="sidebarToggle"
-              aria-label="Toggle sidebar"
-            >
-              ☰
-            </button>
-            <div class="search-box">
-              <span>⌕</span>
-              <input
-                id="globalSearch"
-                type="text"
-                placeholder="Search customers, vehicles, or records"
-                value=""
-              />
-            </div>
-          </div>
-          <div class="topbar-right">
-            <button class="icon-btn" title="Notifications">🔔</button>
-            <button class="icon-btn" title="Help">?</button>
-            <div style="position: relative">
-              <button
-                class="avatar-btn"
-                id="avatarBtn"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                <div class="avatar">DK</div>
-                <div class="avatar-copy">
-                  <strong>Sales Executive</strong>
-                  <span>CRM Workspace</span>
-                </div>
-              </button>
-              <div class="profile-menu" id="profileMenu" role="menu">
-                <div class="profile-item" role="menuitem">👤 Profile</div>
-                <div class="profile-item" role="menuitem">⚙ Settings</div>
-                <div class="profile-item" role="menuitem">⇥ Sign out</div>
-              </div>
-            </div>
-          </div>
-        </header>
-        <main class="page" id="pageRoot">
-          <section class="page-header">
-            <div class="page-title">
-              <h2>Sales Enquiries</h2>
-              <p>
-                All customer enquiries with status, lead temperature, and
-                vehicle details. Filter by status, vehicle, or date.
-              </p>
-            </div>
-            <div class="page-actions">
-              <button class="btn btn-primary" data-nav="enquiry-form">
-                Add Enquiry
-              </button>
-            </div>
-          </section>
-
-          <section class="card">
-            <div class="card-header">
-              <div>
-                <h3>Enquiry Records</h3>
-                <p>Reusable table with status, vehicle, and date filters.</p>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="table-toolbar">
-                <div class="toolbar-left">
-                  <select
-                    class="control"
-                    data-filter="enquiries"
-                    data-filter-key="status"
-                  >
-                    <option value="all" selected="">All Status</option>
-                  </select>
-                  <select
-                    class="control"
-                    data-filter="enquiries"
-                    data-filter-key="vehicle"
-                  >
-                    <option value="all" selected="">All Vehicles</option>
-                  </select>
-                  <select
-                    class="control"
-                    data-filter="enquiries"
-                    data-filter-key="date"
-                  >
-                    <option value="all" selected="">All Dates</option>
-                  </select>
-                </div>
-                <div class="toolbar-right">
-                  <button class="btn btn-primary" data-nav="enquiry-form">
-                    Open Form
-                  </button>
-                </div>
-              </div>
-
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Customer Name</th>
-                      <th>Vehicle Model</th>
-                      <th>Lead Temp</th>
-                      <th>Status</th>
-                      <th>Date</th>
-                      <th>Source</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
-          </section>
-        </main>
+        <header class="topbar" id="topbar"></header>
+        <main class="page" id="pageRoot"></main>
       </div>
     </div>
     <div class="toast-container" id="toastContainer"></div>
@@ -1737,7 +1553,6 @@
         ACCESS_TOKEN: "crm_accessToken",
         REFRESH_TOKEN: "crm_refreshToken",
         LOGGED_IN_USER: "crm_loggedInUser",
-        USER_ROLE: "crm_userRole",
         TOKEN_EXPIRY: "crm_tokenExpiry",
         REMEMBER_ME: "crm_rememberMe",
         REMEMBERED_USER: "crm_rememberedUser",
@@ -1753,24 +1568,23 @@
        AUTH — Core Functions
     ═══════════════════════════════════════════════════════════════ */
       const Auth = {
+        verifiedRole: null,
+        verifiedUser: null,
+
         /* ── Save tokens with expiry based on Remember Me ── */
-        saveTokens(
-          username,
-          accessToken,
-          refreshToken,
-          role,
-          rememberMe = false,
-        ) {
-          const duration = rememberMe
-            ? 7 * 24 * 3600 * 1000 // 7 days if remembered
-            : 3600 * 1000; // 1 hour default
-          const expiry = Date.now() + duration;
+        saveTokens(username, accessToken, refreshToken, rememberMe = false) {
+          const decoded = this.parseJwt(accessToken);
+          if (!decoded?.exp || !VALID_ROLES.includes(decoded.role)) {
+            throw new Error("Invalid access token received from server");
+          }
+          const expiry = decoded.exp * 1000;
 
           localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, accessToken);
           localStorage.setItem(AUTH_KEYS.REFRESH_TOKEN, refreshToken);
           localStorage.setItem(AUTH_KEYS.LOGGED_IN_USER, username);
-          localStorage.setItem(AUTH_KEYS.USER_ROLE, role);
           localStorage.setItem(AUTH_KEYS.TOKEN_EXPIRY, String(expiry));
+          this.verifiedRole = null;
+          this.verifiedUser = null;
         },
 
         /* ── Save/load/clear Remember Me preferences ── */
@@ -1804,8 +1618,9 @@
           localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
           localStorage.removeItem(AUTH_KEYS.REFRESH_TOKEN);
           localStorage.removeItem(AUTH_KEYS.LOGGED_IN_USER);
-          localStorage.removeItem(AUTH_KEYS.USER_ROLE);
           localStorage.removeItem(AUTH_KEYS.TOKEN_EXPIRY);
+          this.verifiedRole = null;
+          this.verifiedUser = null;
           // Note: REMEMBER_ME and REMEMBERED_USER are intentionally preserved
           // here so the username is still pre-filled after session expiry.
           // They are only cleared on explicit logoutUser() call.
@@ -1814,13 +1629,15 @@
         /* ── Check if user is authenticated (token exists + not expired) ── */
         isAuthenticated() {
           const token = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
-          const expiry = parseInt(
-            localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY) || "0",
-            10,
-          );
           if (!token) return false;
-          if (expiry && Date.now() > expiry) {
-            // Token expired — set notification flag, clear tokens
+          const decoded = this.parseJwt(token);
+          if (!decoded || !decoded.exp || !VALID_ROLES.includes(decoded.role)) {
+            this.clearTokens();
+            return false;
+          }
+
+          const expMs = decoded.exp * 1000;
+          if (Date.now() > expMs) {
             sessionStorage.setItem(SESSION_EXPIRED_FLAG, "true");
             this.clearTokens();
             return false;
@@ -1835,7 +1652,15 @@
 
         /* ── Get the currently logged-in user role ── */
         getUserRole() {
-          return localStorage.getItem(AUTH_KEYS.USER_ROLE) || null;
+          if (this.verifiedRole) return this.verifiedRole;
+          // Always derive role from signed JWT to avoid trusting mutable localStorage values
+          const token = this.getAccessToken();
+          if (!token) return null;
+          const decoded = this.parseJwt(token);
+          if (!decoded) return null;
+          // Respect token expiry embedded in JWT
+          if (decoded.exp && Date.now() > decoded.exp * 1000) return null;
+          return VALID_ROLES.includes(decoded.role) ? decoded.role : null;
         },
 
         /* ── Get access token (for use in API requests) ── */
@@ -1871,6 +1696,69 @@
           return { valid: errors.length === 0, errors };
         },
 
+        /* ── Helper: Parse JWT without external libraries ── */
+        parseJwt(token) {
+          try {
+            if (!token || token.split(".").length !== 3) return null;
+            const base64Url = token.split(".")[1];
+            if (!base64Url) return null;
+            const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+            const jsonPayload = decodeURIComponent(
+              atob(base64)
+                .split("")
+                .map(function (c) {
+                  return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+                })
+                .join(""),
+            );
+            return JSON.parse(jsonPayload);
+          } catch (e) {
+            return null;
+          }
+        },
+
+        requireValidSession() {
+          if (!this.isAuthenticated() || !this.verifiedRole) {
+            this.clearTokens();
+            this._resetAppState();
+            this.showLoginPage();
+            return false;
+          }
+          return true;
+        },
+
+        async verifySessionWithBackend() {
+          if (!this.isAuthenticated()) return false;
+          const token = this.getAccessToken();
+          const response = await fetch("http://127.0.0.1:8000/api/auth/me/", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (!response.ok) {
+            this.clearTokens();
+            return false;
+          }
+          const data = await response.json();
+          if (!VALID_ROLES.includes(data.role)) {
+            this.clearTokens();
+            return false;
+          }
+          const tokenRole = this.getUserRole();
+          if (tokenRole && tokenRole !== data.role) {
+            this.clearTokens();
+            return false;
+          }
+          this.verifiedRole = data.role;
+          this.verifiedUser = data.username;
+          if (data.username) {
+            localStorage.setItem(AUTH_KEYS.LOGGED_IN_USER, data.username);
+          }
+          return true;
+        },
+
         /* ── Main loginUser function ── */
         async loginUser(username, password, rememberMe = false) {
           const response = await fetch("http://127.0.0.1:8000/api/token/", {
@@ -1886,25 +1774,21 @@
 
           const data = await response.json();
 
-          // Determine role based on username mapping
-          let role = "sales";
-          if (username.toLowerCase() === "director") {
-            role = "director";
-          } else if (
-            username.toLowerCase() === "admin" ||
-            username.toLowerCase() === "salesmanager"
-          ) {
-            role = "sales";
-          }
+          // Decode token to extract verified claims
+          const decoded = this.parseJwt(data.access);
+          const serverUsername = decoded?.username || username;
 
           this.saveTokens(
-            username,
+            serverUsername,
             data.access,
             data.refresh,
-            role,
             rememberMe,
           );
-          this.saveSession(username, rememberMe);
+          this.saveSession(serverUsername, rememberMe);
+          const verified = await this.verifySessionWithBackend();
+          if (!verified) {
+            throw new Error("Unable to verify authenticated session");
+          }
           return data;
         },
 
@@ -1943,6 +1827,12 @@
 
         /* ── authFetch: Authenticated API requests with automatic token refresh ── */
         async authFetch(url, options = {}, _isRetry = false) {
+          if (!this.isAuthenticated() || !this.verifiedRole) {
+            this.clearTokens();
+            this._resetAppState();
+            this.showLoginPage();
+            throw new Error("Invalid or expired session.");
+          }
           const token = this.getAccessToken();
           const headers = {
             "Content-Type": "application/json",
@@ -1997,21 +1887,16 @@
               const data = await response.json();
               if (!data.access) return false;
 
-              // Update stored access token and extend expiry
+              // Update stored access token and set expiry based on JWT exp claim when available
               localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, data.access);
-              const currentExpiry = parseInt(
-                localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY) || "0",
-                10,
-              );
-              const isRemembered =
-                localStorage.getItem(AUTH_KEYS.REMEMBER_ME) === "true";
-              const duration = isRemembered
-                ? 7 * 24 * 3600 * 1000
-                : 3600 * 1000;
+              const decoded = this.parseJwt(data.access) || {};
+              if (!decoded.exp || !VALID_ROLES.includes(decoded.role))
+                return false;
               localStorage.setItem(
                 AUTH_KEYS.TOKEN_EXPIRY,
-                String(Date.now() + duration),
+                String(decoded.exp * 1000),
               );
+              this.verifiedRole = decoded.role;
 
               return true;
             } catch {
@@ -2092,21 +1977,24 @@
 
         /* ── Initialize authentication on page load ── */
         initializeAuth() {
-          return new Promise((resolve) => {
-            if (this.isAuthenticated()) {
+          return new Promise(async (resolve) => {
+            if (
+              this.isAuthenticated() &&
+              (await this.verifySessionWithBackend())
+            ) {
               const role = this.getUserRole();
-              if (role === "sales") {
-                this.showDashboard();
-              } else if (role === "director") {
-                // Directors should be on the chatbot page
-                window.location.href =
-                  "../llm/Platinum_Sales_Chatbot-main/index.html";
-                return;
-              } else {
-                this.showLoginPage();
-              }
+
+              const hash = window.location.hash.replace("#", "");
+              const defaultRoute = DEFAULT_ROUTE_BY_ROLE[role] || "dashboard";
+              const requestedView =
+                hash || appState.currentView || defaultRoute;
+              Router.navigate(
+                resolveNavigationTarget(requestedView, role).viewId,
+              );
+              this.showDashboard();
               resolve();
             } else {
+              this.clearTokens();
               this.showLoginPage();
               this._checkSessionExpiry();
               resolve();
@@ -2183,33 +2071,32 @@
               await Auth.loginUser(username, password, rememberMe);
 
               // Load backend data now that the user is authenticated
-              await loadEnquiriesFromApi();
-              await loadAppointmentsFromApi();
-              await loadFeedbackFromApi();
+              await Actions.refreshAll();
 
-              // Success — transition to dashboard
+              // Success — resolve the route before revealing the shell
               const role = Auth.getUserRole();
+
               if (role === "director") {
                 Utils.toast(
-                  "Welcome, Director. Redirecting to Chatbot...",
+                  "Welcome, Director. Accessing Strategic Panel...",
                   "success",
                 );
-                setTimeout(() => {
-                  window.location.href =
-                    "../llm/Platinum_Sales_Chatbot-main/index.html";
-                }, 1000);
+                Router.navigate(DEFAULT_ROUTE_BY_ROLE.director);
+              } else if (role === "admin") {
+                Router.navigate(DEFAULT_ROUTE_BY_ROLE.admin);
+                Utils.toast("Welcome, Admin. Accessing controls.", "success");
               } else {
-                Auth.showDashboard();
+                Router.navigate(DEFAULT_ROUTE_BY_ROLE[role] || "dashboard");
                 Utils.toast(
                   `Welcome back, ${Auth.getLoggedInUser()}! 🎉`,
                   "success",
                 );
               }
 
+              Auth.showDashboard();
+
               // Re-render topbar to show logged-in user info
-              if (role !== "director") {
-                Renderer.topbar();
-              }
+              Renderer.topbar();
             } catch (err) {
               // Failed login — highlight fields and show error
               if (usernameEl) usernameEl.classList.add("auth-error");
@@ -2327,6 +2214,20 @@
           const data = await response.json();
           return data;
         },
+
+        async getDirectorReport() {
+          const response = await Auth.authFetch(
+            `${API_BASE}/director/revenue/`,
+          );
+          if (!response.ok) throw new Error("Failed to fetch director report");
+          return response.json();
+        },
+
+        async getAdminLogs() {
+          const response = await Auth.authFetch(`${API_BASE}/admin/logs/`);
+          if (!response.ok) throw new Error("Failed to fetch audit logs");
+          return response.json();
+        },
       };
 
       /* ═══════════════════════════════════════════════════════════════
@@ -2413,6 +2314,8 @@
         enquiries: [],
         appointments: [],
         feedback: [],
+        directorReport: null,
+        adminLogs: [],
 
         setEnquiries(records) {
           this.enquiries = records;
@@ -2437,33 +2340,226 @@
         addFeedback(record) {
           this.feedback.unshift(record);
         },
+
+        setDirectorReport(data) {
+          this.directorReport = data;
+        },
+
+        setAdminLogs(logs) {
+          this.adminLogs = logs;
+        },
+      };
+
+      const Actions = {
+        async refreshAll() {
+          const role = Auth.getUserRole();
+          if (!Auth.requireValidSession()) return;
+          try {
+            const canReadEnquiries = role === "admin" || role === "director";
+            const canReadAppointments =
+              role === "admin" ||
+              role === "director" ||
+              role === "salesmanager" ||
+              role === "manager";
+            const canReadFeedback = role === "admin" || role === "director";
+
+            if (canReadEnquiries || canReadAppointments || canReadFeedback) {
+              const [enq, app, fdb] = await Promise.all([
+                canReadEnquiries ? Api.getEnquiries() : Promise.resolve([]),
+                canReadAppointments ? Api.getAppointments() : Promise.resolve([]),
+                canReadFeedback ? Api.getFeedback() : Promise.resolve([]),
+              ]);
+
+              // Map backend fields to frontend local fields for consistency
+              Store.setEnquiries(
+                enq.map((item) => ({
+                  id: item.enquiry_id,
+                  customer: item.customer,
+                  vehicle: item.vehicle,
+                  temperature: item.temperature,
+                  status: item.status,
+                  date: item.date,
+                  source: item.source,
+                })),
+              );
+
+              Store.setAppointments(
+                app.map((item) => ({
+                  id: item.appointment_id,
+                  customer: item.customer,
+                  vehicle: item.vehicle,
+                  status: item.status,
+                  date: item.date,
+                  time: item.time,
+                })),
+              );
+
+              Store.setFeedback(
+                fdb.map((item) => ({
+                  id: item.feedback_id,
+                  enquiryId: item.enquiry_id,
+                  customer: item.customer,
+                  vehicle: item.vehicle,
+                  status: item.status,
+                  date: item.date,
+                  rating: item.rating,
+                  feedback_text: item.feedback_text,
+                })),
+              );
+            } else {
+              Store.setEnquiries([]);
+              Store.setAppointments([]);
+              Store.setFeedback([]);
+            }
+
+            if (role === "admin" || role === "director") {
+              const report = await Api.getDirectorReport();
+              Store.setDirectorReport(report);
+            } else {
+              Store.setDirectorReport(null);
+            }
+
+            if (role === "admin") {
+              const logs = await Api.getAdminLogs();
+              Store.setAdminLogs(logs);
+            } else {
+              Store.setAdminLogs([]);
+            }
+          } catch (e) {
+            console.error("Data refresh failed", e);
+            Utils.toast(
+              "Database sync failed. Working with cached data.",
+              "warning",
+            );
+          }
+        },
       };
 
       /* ═══════════════════════════════════════════════════════════════
        CONFIG: NAVIGATION
     ═══════════════════════════════════════════════════════════════ */
-      const NAV_CONFIG = [
-        { id: "dashboard", label: "Dashboard", icon: "⌂", group: "Workspace" },
+      const ROUTE_CONFIG = [
+        {
+          id: "dashboard",
+          label: "Dashboard",
+          icon: "⌂",
+          group: "Workspace",
+          roles: ["admin", "director", "salesmanager", "sales"],
+          nav: true,
+        },
         {
           id: "sales-enquiries",
           label: "Sales Enquiries",
           icon: "▣",
           group: "Sales",
+          roles: ["admin", "salesmanager", "sales"],
+          nav: true,
         },
         {
           id: "enquiry-form",
           label: "Enquiry Form",
           icon: "✎",
           group: "Sales",
+          roles: ["admin", "salesmanager", "sales"],
+          nav: true,
         },
         {
           id: "appointments",
           label: "Appointment Booking",
           icon: "🗓",
           group: "Sales",
+          roles: ["admin", "salesmanager", "sales"],
+          nav: true,
         },
-        { id: "feedback", label: "Sales Feedback", icon: "☰", group: "Sales" },
+        {
+          id: "appointment-form",
+          label: "New Appointment",
+          group: "Sales",
+          roles: ["admin", "salesmanager", "sales"],
+          nav: false,
+        },
+        {
+          id: "feedback",
+          label: "Sales Feedback",
+          icon: "☰",
+          group: "Sales",
+          roles: ["admin", "salesmanager", "sales"],
+          nav: true,
+        },
+        {
+          id: "reports",
+          label: "Executive Reports",
+          icon: "📊",
+          group: "Director",
+          roles: ["admin", "director"],
+          nav: true,
+        },
+        {
+          id: "director-dashboard",
+          label: "Director Panel",
+          icon: "📈",
+          group: "Director",
+          roles: ["admin", "director"],
+          nav: true,
+        },
+        {
+          id: "admin-controls",
+          label: "Admin Settings",
+          icon: "⚙",
+          group: "System",
+          roles: ["admin"],
+          nav: true,
+        },
       ];
+
+      const NAV_CONFIG = ROUTE_CONFIG.filter((route) => route.nav);
+      const DEFAULT_ROUTE_BY_ROLE = {
+        admin: "admin-controls",
+        director: "director-dashboard",
+        salesmanager: "dashboard",
+        sales: "dashboard",
+      };
+      const VALID_ROLES = Object.keys(DEFAULT_ROUTE_BY_ROLE);
+      const ROUTE_REDIRECTS_BY_ROLE = {
+        admin: {
+          dashboard: "admin-controls",
+        },
+        director: {
+          dashboard: "director-dashboard",
+        },
+      };
+
+      function resolveRouteForRole(viewId, role) {
+        return ROUTE_REDIRECTS_BY_ROLE[role]?.[viewId] || viewId;
+      }
+
+      function resolveNavigationTarget(viewId, role) {
+        const resolvedViewId = resolveRouteForRole(viewId, role);
+        let navItem = ROUTE_CONFIG.find((item) => item.id === resolvedViewId);
+
+        // Allow loose matching (e.g. 'admin' matches 'admin-controls')
+        if (!navItem) {
+          navItem = ROUTE_CONFIG.find((item) =>
+            item.id.startsWith(resolvedViewId),
+          );
+        }
+
+        if (!navItem) {
+          return {
+            viewId: resolvedViewId,
+            navItem: null,
+            allowed: false,
+            deniedRoute: resolvedViewId || "Unknown route",
+          };
+        }
+
+        return {
+          viewId: navItem.id,
+          navItem,
+          allowed: !navItem.roles || navItem.roles.includes(role),
+          deniedRoute: navItem.label,
+        };
+      }
 
       /* ═══════════════════════════════════════════════════════════════
        CONFIG: ENQUIRY FORM FIELDS
@@ -2594,10 +2690,10 @@
 
         { section: "Address Details" },
         {
-          label: "Address 1",
-          name: "address1",
-          type: "text",
-          placeholder: "Primary address",
+        label: "Address 1",
+        name: "address1",
+        type: "text",
+        placeholder: "Primary address",
         },
         {
           label: "Address 4",
@@ -2772,25 +2868,25 @@
               label: "Total Enquiries",
               value: rows.length,
               icon: "◎",
-              trend: "+12% vs last week",
+              trend: "-",
             },
             {
               label: "Open Pipeline",
               value: submitted + draft,
               icon: "◔",
-              trend: "8 active follow-ups",
+              trend: "-",
             },
             {
               label: "Appointments",
               value: Store.appointments.length,
               icon: "◫",
-              trend: "3 this week",
+              trend: "-",
             },
             {
               label: "Closed Leads",
               value: closed,
               icon: "✓",
-              trend: "Improving steadily",
+              trend: "-",
             },
           ];
         },
@@ -2802,10 +2898,19 @@
       const Components = {
         /* ── Sidebar ── */
         sidebar() {
-          const groups = [...new Set(NAV_CONFIG.map((item) => item.group))];
+          const userRole = Auth.getUserRole();
+          if (!userRole) return "";
+
+          // Filter NAV_CONFIG based on role
+          const filteredNav = NAV_CONFIG.filter(
+            (item) => !item.roles || item.roles.includes(userRole),
+          );
+
+          const groups = [...new Set(filteredNav.map((item) => item.group))];
           const groupHTML = groups
             .map((group) => {
-              const items = NAV_CONFIG.filter((item) => item.group === group)
+              const items = filteredNav
+                .filter((item) => item.group === group)
                 .map(
                   (item) => `
             <div class="nav-link ${appState.currentView === item.id ? "active" : ""}"
@@ -3246,8 +3351,8 @@
             (r) => r.temperature === "Cold",
           ).length;
           const total = Store.enquiries.length;
-          const hotPct = Math.round((hot / total) * 100);
-          const warmPct = Math.round((warm / total) * 100);
+          const hotPct = total > 0 ? Math.round((hot / total) * 100) : 0;
+          const warmPct = total > 0 ? Math.round((warm / total) * 100) : 0;
           const hotDeg = hotPct * 3.6;
           const warmDeg = warmPct * 3.6;
 
@@ -3258,7 +3363,7 @@
           const sourceItems = Object.entries(sources).map(([src, count]) => ({
             primary: src,
             secondary: `${count} enquiries`,
-            badge: `${Math.round((count / total) * 100)}%`,
+            badge: `${total > 0 ? Math.round((count / total) * 100) : 0}%`,
           }));
 
           const leadDistContent = `
@@ -3271,8 +3376,8 @@
             </div>
             <div style="width:100%;max-width:220px;">
               <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#dc2626;">🔴 Hot</span><span>${hot} (${hotPct}%)</span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#ea580c;">🟠 Warm</span><span>${warm} (${Math.round((warm / total) * 100)}%)</span></div>
-              <div style="display:flex;justify-content:space-between;"><span style="color:#2563eb;">🔵 Cold</span><span>${cold} (${Math.round((cold / total) * 100)}%)</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#ea580c;">🟠 Warm</span><span>${warm} (${warmPct}%)</span></div>
+              <div style="display:flex;justify-content:space-between;"><span style="color:#2563eb;">🔵 Cold</span><span>${cold} (${total > 0 ? Math.round((cold / total) * 100) : 0}%)</span></div>
             </div>
           </div>
         `;
@@ -3418,6 +3523,332 @@
           </div>
         `;
         },
+
+        "director-dashboard"() {
+          const report = Store.directorReport || {};
+          const temperatureBreakdown = Array.isArray(
+            report.temperature_breakdown,
+          )
+            ? report.temperature_breakdown
+            : [];
+          const sourceBreakdown = Array.isArray(report.source_breakdown)
+            ? report.source_breakdown
+            : [];
+          const totalTemperature = temperatureBreakdown.reduce(
+            (sum, item) => sum + Number(item.count || 0),
+            0,
+          );
+          const topSourceCount = sourceBreakdown.reduce(
+            (max, item) => Math.max(max, Number(item.count || 0)),
+            0,
+          );
+
+          // Use real data from the backend report
+          const metrics = [
+            {
+              label: "Total Enquiries",
+              value: String(report.total_enquiries || 0),
+              icon: "◔",
+              trend: "-",
+            },
+            {
+              label: "Appointments",
+              value: String(report.total_appointments || 0),
+              icon: "◫",
+              trend: "-",
+            },
+            {
+              label: "Feedbacks",
+              value: String(report.total_feedback || 0),
+              icon: "📝",
+              trend: "-",
+            },
+            {
+              label: "Conversion Rate",
+              value: `${report.conversion_rate_percent || 0}%`,
+              icon: "🎯",
+              trend: "-",
+            },
+          ];
+
+          const metricCards = metrics
+            .map(
+              (m) => `
+            <section class="card stat-card">
+              <div class="stat-top">
+                <div>
+                  <small>${Utils.escape(m.label)}</small>
+                  <h3>${m.value}</h3>
+                </div>
+                <div class="stat-icon">${m.icon}</div>
+              </div>
+              <div class="trend">${Utils.escape(m.trend)}</div>
+            </section>
+          `,
+            )
+            .join("");
+
+          return `
+            <section class="page-header">
+              <div class="page-title">
+                <h2>Director Insights & Analytics</h2>
+                <p>High-level performance metrics, sales conversion data, and pipeline breakdown.</p>
+              </div>
+              <div class="page-actions">
+                <a href="../llm/Platinum_Sales_Chatbot-main/index.html" class="btn btn-primary">Open AI Strategy Chatbot</a>
+              </div>
+            </section>
+            
+            <div class="stats-grid">
+              ${metricCards}
+            </div>
+
+            <section class="split-grid">
+              ${Components.card({
+                title: "Lead Temperature Mix",
+                subtitle: "Live distribution for strategic pipeline review",
+                content: temperatureBreakdown.length
+                  ? `<div style="display:flex; flex-direction:column; gap:14px;">
+                      ${temperatureBreakdown
+                        .map((t) => {
+                          const count = Number(t.count || 0);
+                          const percent = totalTemperature
+                            ? Math.round((count / totalTemperature) * 100)
+                            : 0;
+                          return `
+                            <div>
+                              <div style="display:flex; justify-content:space-between; gap:12px; margin-bottom:8px; font-weight:700;">
+                                <span>${Utils.escape(t.temperature || "Unspecified")}</span>
+                                <span>${Utils.escape(String(percent))}%</span>
+                              </div>
+                              <div style="height:10px; background:#e5e7eb; border-radius:999px; overflow:hidden;">
+                                <div style="height:100%; width:${percent}%; background:#2563eb; border-radius:999px;"></div>
+                              </div>
+                            </div>
+                          `;
+                        })
+                        .join("")}
+                    </div>`
+                  : `<div style="padding:12px;color:var(--muted);">No temperature analytics available.</div>`,
+              })}
+              ${Components.card({
+                title: "Lead Source Momentum",
+                subtitle:
+                  "Visual channel concentration across incoming enquiries",
+                content: sourceBreakdown.length
+                  ? `<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:12px;">
+                      ${sourceBreakdown
+                        .map((s) => {
+                          const count = Number(s.count || 0);
+                          const height = topSourceCount
+                            ? Math.max(
+                                18,
+                                Math.round((count / topSourceCount) * 84),
+                              )
+                            : 18;
+                          return `
+                            <div style="min-height:132px; display:flex; flex-direction:column; justify-content:flex-end; gap:8px;">
+                              <div style="height:${height}px; background:#0f766e; border-radius:8px 8px 3px 3px;"></div>
+                              <strong style="font-size:13px;">${Utils.escape(s.source || "Unspecified")}</strong>
+                              <span style="color:var(--muted); font-size:12px;">${Utils.escape(String(count))} enquiries</span>
+                            </div>
+                          `;
+                        })
+                        .join("")}
+                    </div>`
+                  : `<div style="padding:12px;color:var(--muted);">No source analytics available.</div>`,
+              })}
+            </section>
+          `;
+        },
+
+        reports() {
+          const report = Store.directorReport || {};
+          const temps = Array.isArray(report.temperature_breakdown)
+            ? report.temperature_breakdown
+            : [];
+          const sources = Array.isArray(report.source_breakdown)
+            ? report.source_breakdown
+            : [];
+
+          return `
+            <section class="page-header">
+              <div class="page-title">
+                <h2>Executive Reports</h2>
+                <p>Backend-driven sales performance breakdowns for director review.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-primary" onclick="window.print()">Export Report</button>
+              </div>
+            </section>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3>Lead Temperature Report</h3>
+                  <p>Enquiries grouped by backend temperature data.</p>
+                </div>
+              </div>
+              <div class="card-body">
+                <div style="overflow-x: auto;">
+                  <table class="data-table">
+                    <thead>
+                      <tr><th>Temperature</th><th>Count</th></tr>
+                    </thead>
+                    <tbody>
+                      ${
+                        temps.length > 0
+                          ? temps
+                              .map(
+                                (t) => `
+                        <tr>
+                          <td>${Utils.escape(t.temperature || "Unspecified")}</td>
+                          <td>${Utils.escape(String(t.count || 0))}</td>
+                        </tr>
+                      `,
+                              )
+                              .join("")
+                          : '<tr><td colspan="2" style="text-align:center;">No temperature data found.</td></tr>'
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3>Enquiry Source Report</h3>
+                  <p>Lead sources grouped by backend enquiry data.</p>
+                </div>
+              </div>
+              <div class="card-body">
+                <div style="overflow-x: auto;">
+                  <table class="data-table">
+                    <thead>
+                      <tr><th>Source</th><th>Count</th></tr>
+                    </thead>
+                    <tbody>
+                      ${
+                        sources.length > 0
+                          ? sources
+                              .map(
+                                (s) => `
+                        <tr>
+                          <td>${Utils.escape(s.source || "Unspecified")}</td>
+                          <td>${Utils.escape(String(s.count || 0))}</td>
+                        </tr>
+                      `,
+                              )
+                              .join("")
+                          : '<tr><td colspan="2" style="text-align:center;">No source data found.</td></tr>'
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `;
+        },
+
+        "admin-controls"() {
+          const uniqueUsers = new Set(
+            Store.adminLogs.map((l) => l.user).filter(Boolean),
+          );
+          const activeUsers = uniqueUsers.size;
+
+          return `
+            <section class="page-header">
+              <div class="page-title">
+                <h2>System Administration</h2>
+                <p>Review administrative activity from the secured backend audit log.</p>
+              </div>
+            </section>
+
+            <div class="stats-grid">
+              <section class="card stat-card">
+                <div class="stat-top">
+                  <div><small>Active Users</small><h3>${Utils.escape(String(activeUsers))}</h3></div>
+                  <div class="stat-icon">👥</div>
+                </div>
+                <div class="trend">${Utils.escape(`${Store.adminLogs.length} recent audit events`)}</div>
+              </section>
+              <section class="card stat-card">
+                <div class="stat-top">
+                  <div><small>Audit Events</small><h3>${Utils.escape(String(Store.adminLogs.length))}</h3></div>
+                  <div class="stat-icon">📈</div>
+                </div>
+                <div class="trend">${Utils.escape("Loaded from /api/admin/logs/")}</div>
+              </section>
+              <section class="card stat-card">
+                <div class="stat-top">
+                  <div><small>Admin Endpoint</small><h3>Secured</h3></div>
+                  <div class="stat-icon">🗄</div>
+                </div>
+                <div class="trend">${Utils.escape("403 for non-admin roles")}</div>
+              </section>
+            </div>
+
+            <section class="card">
+              <div class="card-header">
+                <div>
+                  <h3>Security Audit Log</h3>
+                  <p>Recent administrative actions and authentication events.</p>
+                </div>
+              </div>
+              <div class="card-body">
+                <div style="overflow-x: auto;">
+                  <table class="data-table">
+                    <thead>
+                      <tr><th>Timestamp</th><th>User</th><th>Action</th><th>Target</th><th>Details</th></tr>
+                    </thead>
+                    <tbody>
+                      ${
+                        Store.adminLogs.length > 0
+                          ? Store.adminLogs
+                              .map(
+                                (log) => `
+                        <tr>
+                          <td>${Utils.escape(log.timestamp)}</td>
+                          <td>${Utils.escape(log.user || "System")}</td>
+                          <td>${Utils.escape(log.action_flag)}</td>
+                          <td>${Utils.escape(log.object || "-")}</td>
+                          <td>${Utils.escape(log.change_message || "-")}</td>
+                        </tr>
+                      `,
+                              )
+                              .join("")
+                          : '<tr><td colspan="5" style="text-align:center;">No audit logs found.</td></tr>'
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+          `;
+        },
+
+        "access-denied"() {
+          const userRole = Auth.getUserRole() || "Unknown";
+          const attemptedRoute = appState.deniedRoute || "this module";
+
+          return `
+            <div class="card" style="max-width: 500px; margin: 80px auto; text-align: center; overflow: visible;">
+              <div class="card-body" style="padding: 40px 30px;">
+                <div style="width: 64px; height: 64px; background: #fef2f2; color: #dc2626; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: -72px auto 20px auto; border: 4px solid var(--bg); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);">
+                  🔒
+                </div>
+                <h2 style="font-size: 22px; margin: 0 0 12px; font-weight: 800; letter-spacing: -0.02em;">403 Access Restricted</h2>
+                <p style="color: var(--muted); line-height: 1.6; margin-bottom: 24px; font-size: 14px;">
+                  Your current role (<strong style="text-transform: capitalize; color: var(--text);">${Utils.escape(userRole)}</strong>) 
+                  does not have permission to view <strong>${Utils.escape(attemptedRoute)}</strong>.
+                </p>
+                <button class="btn btn-primary" onclick="Router.navigate(DEFAULT_ROUTE_BY_ROLE[Auth.getUserRole()] || 'dashboard')" style="width: 100%;">
+                  Return to Workspace
+                </button>
+              </div>
+            </div>
+          `;
+        },
       };
 
       /* ═══════════════════════════════════════════════════════════════
@@ -3425,7 +3856,31 @@
     ═══════════════════════════════════════════════════════════════ */
       const Router = {
         navigate(viewId) {
-          appState.currentView = viewId;
+          if (!Auth.requireValidSession()) return;
+          const userRole = Auth.getUserRole();
+          const target = resolveNavigationTarget(viewId, userRole);
+
+          // Role-based route guard
+          if (!target.allowed) {
+            Utils.toast("Access Denied: Insufficient Permissions", "error");
+            appState.currentView = "access-denied";
+            appState.deniedRoute = target.deniedRoute;
+
+            if (window.innerWidth <= 900) {
+              appState.mobileSidebarOpen = false;
+              Shell.sync();
+            }
+            window.history.replaceState(null, null, "#access-denied");
+            Persist.saveUI();
+            Renderer.page();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return;
+          }
+
+          appState.currentView = target.viewId;
+          if (target.viewId !== "access-denied") {
+            window.history.replaceState(null, null, "#" + target.viewId);
+          }
           if (window.innerWidth <= 900) {
             appState.mobileSidebarOpen = false;
             Shell.sync();
@@ -3760,75 +4215,22 @@
         },
       };
 
-      async function loadEnquiriesFromApi() {
-        try {
-          const response = await Auth.authFetch(
-            "http://127.0.0.1:8000/api/enquiry/",
-          );
-          const data = await response.json();
-
-          const mapped = data.map((item) => ({
-            id: item.enquiry_id,
-            customer: item.customer,
-            vehicle: item.vehicle,
-            temperature: item.temperature,
-            status: item.status,
-            date: item.date,
-            source: item.source,
-          }));
-
-          Store.setEnquiries(mapped);
-        } catch (error) {
-          console.error("Error loading enquiries:", error);
-          Store.setEnquiries([]);
-        }
-      }
-
-      async function loadAppointmentsFromApi() {
-        try {
-          const data = await Api.getAppointments();
-
-          const mapped = data.map((item) => ({
-            id: item.appointment_id,
-            customer: item.customer,
-            vehicle: item.vehicle,
-            status: item.status,
-            date: item.date,
-            time: item.time,
-          }));
-
-          Store.setAppointments(mapped);
-        } catch (error) {
-          console.error("Error loading appointments:", error);
-          Store.setAppointments([]);
-        }
-      }
-
-      async function loadFeedbackFromApi() {
-        try {
-          const data = await Api.getFeedback();
-
-          const mapped = data.map((item) => ({
-            id: item.feedback_id,
-            enquiryId: item.enquiry_id,
-            customer: item.customer,
-            vehicle: item.vehicle,
-            status: item.status,
-            date: item.date,
-          }));
-
-          Store.setFeedback(mapped);
-        } catch (error) {
-          console.error("Error loading feedback:", error);
-          Store.setFeedback([]);
-        }
-      }
-
       /* ═══════════════════════════════════════════════════════════════
        INIT
     ═══════════════════════════════════════════════════════════════ */
       async function init() {
         Persist.loadUI();
+
+        window.addEventListener("hashchange", () => {
+          const hash = window.location.hash.replace("#", "");
+          if (
+            hash &&
+            hash !== appState.currentView &&
+            hash !== "access-denied"
+          ) {
+            Router.navigate(hash);
+          }
+        });
 
         // Auth MUST be initialized before any protected data is loaded.
         // initializeAuth() shows the login page if no valid session exists
@@ -3836,10 +4238,11 @@
         await Auth.initializeAuth();
 
         // Only load backend data if the user is authenticated
-        if (Auth.isAuthenticated()) {
-          await loadEnquiriesFromApi();
-          await loadAppointmentsFromApi();
-          await loadFeedbackFromApi();
+        if (
+          Auth.isAuthenticated() &&
+          appState.currentView !== "access-denied"
+        ) {
+          await Actions.refreshAll();
         }
 
         Renderer.topbar();

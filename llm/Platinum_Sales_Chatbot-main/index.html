@@ -463,15 +463,15 @@
         ACCESS_TOKEN: "crm_accessToken",
         REFRESH_TOKEN: "crm_refreshToken",
         LOGGED_IN_USER: "crm_loggedInUser",
-        USER_ROLE: "crm_userRole",
         TOKEN_EXPIRY: "crm_tokenExpiry",
         REMEMBER_ME: "crm_rememberMe",
         REMEMBERED_USER: "crm_rememberedUser",
       };
 
-      function checkDirectorAuth() {
+      const API = "http://127.0.0.1:8000";
+
+      async function checkDirectorAuth() {
         const token = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
-        const role = localStorage.getItem(AUTH_KEYS.USER_ROLE);
         const expiry = parseInt(
           localStorage.getItem(AUTH_KEYS.TOKEN_EXPIRY) || "0",
           10,
@@ -481,21 +481,73 @@
 
         if (!isAuthenticated) {
           window.location.href = "../../frontend/index.html";
-          return;
+          return false;
         }
 
-        if (role !== "director") {
-          alert("Access Denied: Directors Only");
+        let role = null;
+
+        // Decode token to verify and fallback if role is not in localStorage
+        try {
+          const base64Url = token.split(".")[1];
+          const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+          const jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split("")
+              .map(function (c) {
+                return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+              })
+              .join(""),
+          );
+          const decoded = JSON.parse(jsonPayload);
+          
+          // Strict expiration check from the JWT payload
+          if (decoded.exp && Date.now() >= decoded.exp * 1000) {
+            alert("Session expired. Please log in again.");
+            localStorage.clear();
+            window.location.href = "../../frontend/index.html";
+            return false;
+          }
+          
+          role = decoded.role;
+          if (decoded.role !== "director" && decoded.role !== "admin") {
+            alert("Security Breach: Invalid Role Claim");
+            localStorage.clear();
+            window.location.href = "../../frontend/index.html";
+            return false;
+          }
+        } catch (e) {
           window.location.href = "../../frontend/index.html";
-          return;
+          return false;
+        }
+
+        // Production hardening: verify role matches director or admin
+        if (role !== "director" && role !== "admin") {
+          alert("Access Denied: Director/Admin access required");
+          window.location.href = "../../frontend/index.html";
+          return false;
+        }
+        try {
+          const response = await fetch(`${API}/api/auth/me/`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const user = await response.json();
+          if (!response.ok || (user.role !== "director" && user.role !== "admin")) {
+            alert("Access Denied: Director/Admin access required");
+            window.location.href = "../../frontend/index.html";
+            return false;
+          }
+          return true;
+        } catch {
+          window.location.href = "../../frontend/index.html";
+          return false;
         }
       }
-      checkDirectorAuth();
-
-      const API = "http://127.0.0.1:8000";
+      const DIRECTOR_AUTH_READY = checkDirectorAuth();
 
       // ── Authenticated Fetch Helper
       async function authFetch(url, options = {}) {
+        const ok = await DIRECTOR_AUTH_READY;
+        if (!ok) throw new Error("Director session verification failed.");
         const token = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
         const headers = {
           "Content-Type": "application/json",

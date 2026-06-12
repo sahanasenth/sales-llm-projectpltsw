@@ -1,24 +1,53 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.db.models import Count
 from django.http import JsonResponse
-from rest_framework.response import Response
+from django.contrib.admin.models import LogEntry
 from rest_framework import status
-from .models import Enquiry, Appointment, Feedback
-from .serializers import (
-    EnquirySerializer,
-    AppointmentSerializer,
-    FeedbackSerializer,
-    UserRegistrationSerializer,
-    CustomTokenObtainPairSerializer,
-)
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .permissions import IsDirector, IsManager, IsSalesExecutive, IsManagerOrDirector
+
+from .models import Enquiry, Appointment, Feedback
+from .permissions import (
+    IsAdmin,
+    IsDirector,
+    IsManager,
+    IsManagerOrDirector,
+    IsSalesExecutive,
+    get_user_role,
+)
+from .serializers import (
+    AppointmentSerializer,
+    EnquirySerializer,
+    FeedbackSerializer,
+    CustomTokenObtainPairSerializer,
+    UserRegistrationSerializer,
+)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 def home(request):
     return JsonResponse({
         "message": "Sales CRM backend is running"
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user(request):
+    role = get_user_role(request.user)
+    if not role:
+        return Response(
+            {"detail": "User role information is missing."},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    return Response({
+        "username": request.user.username,
+        "role": role,
     })
 
 
@@ -36,7 +65,6 @@ def create_enquiry(request):
     from .services import reset_chatbot_instance
 
     data = request.data.copy()
-
     incoming_id = data.get('id')
     if not incoming_id:
         return Response(
@@ -45,7 +73,6 @@ def create_enquiry(request):
         )
 
     data['enquiry_id'] = incoming_id
-
     serializer = EnquirySerializer(data=data)
     if serializer.is_valid():
         serializer.save()
@@ -69,7 +96,6 @@ def create_appointment(request):
     from .services import reset_chatbot_instance
 
     data = request.data.copy()
-
     incoming_id = data.get('id')
     if not incoming_id:
         return Response(
@@ -78,7 +104,6 @@ def create_appointment(request):
         )
 
     data['appointment_id'] = incoming_id
-
     serializer = AppointmentSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
@@ -102,7 +127,6 @@ def create_feedback(request):
     from .services import reset_chatbot_instance
 
     data = request.data.copy()
-
     incoming_id = data.get('id')
     if not incoming_id:
         return Response(
@@ -111,7 +135,6 @@ def create_feedback(request):
         )
 
     data['feedback_id'] = incoming_id
-
     serializer = FeedbackSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
@@ -121,44 +144,87 @@ def create_feedback(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsDirector])
+def get_revenue_report(request):
+    total_enquiries = Enquiry.objects.count()
+    total_appointments = Appointment.objects.count()
+    total_feedback = Feedback.objects.count()
+
+    conversion_rate = 0
+    if total_enquiries > 0:
+        conversion_rate = round((total_appointments / total_enquiries) * 100, 2)
+
+    temp_breakdown = list(
+        Enquiry.objects.values('temperature').annotate(count=Count('id')).order_by('-count')
+    )
+    source_breakdown = list(
+        Enquiry.objects.values('source').annotate(count=Count('id')).order_by('-count')
+    )
+
+    return Response({
+        'total_enquiries': total_enquiries,
+        'total_appointments': total_appointments,
+        'total_feedback': total_feedback,
+        'conversion_rate_percent': conversion_rate,
+        'temperature_breakdown': temp_breakdown,
+        'source_breakdown': source_breakdown,
+    })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsAdmin])
+def get_audit_logs(request):
+    entries = LogEntry.objects.select_related('user').order_by('-action_time')[:100]
+    logs = []
+    for entry in entries:
+        logs.append({
+            'timestamp': entry.action_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'user': entry.user.username if entry.user else None,
+            'action_flag': entry.get_action_flag_display()
+            if hasattr(entry, 'get_action_flag_display')
+            else entry.action_flag,
+            'object': entry.object_repr,
+            'change_message': entry.change_message,
+        })
+    return Response(logs)
+
+
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def chat_api(request):
     from .services import process_chat_query
 
     query = request.data.get('query')
-   
+
     if not query:
         return Response(
             {"error": "Missing 'query' in request body."},
-        status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_400_BAD_REQUEST
         )
 
     if not isinstance(query, str):
         return Response(
-             {"error": "Query must be a string."},
-        status=status.HTTP_400_BAD_REQUEST
+            {"error": "Query must be a string."},
+            status=status.HTTP_400_BAD_REQUEST
         )
 
     query = query.strip()
-
     if not query:
         return Response(
             {"error": "Query cannot be empty or whitespace only."},
-        status=status.HTTP_400_BAD_REQUEST
+            status=status.HTTP_400_BAD_REQUEST
         )
 
-    MAX_QUERY_LENGTH = 500
-
-    if len(query) > MAX_QUERY_LENGTH:
+    max_query_length = 500
+    if len(query) > max_query_length:
         return Response(
-             {"error": f"Query exceeds maximum length of {MAX_QUERY_LENGTH} characters."},
-        status=status.HTTP_400_BAD_REQUEST
-        )    
+            {"error": f"Query exceeds maximum length of {max_query_length} characters."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     try:
         response_data = process_chat_query(query)
-
         if response_data.get("status") != "success":
             return Response(
                 {"error": response_data.get("message", "Chatbot processing failed.")},
@@ -173,11 +239,11 @@ def chat_api(request):
 
     except Exception as exc:
         print(f"Chat error: {exc}")
-
         return Response(
             {"error": "An unexpected error occurred while processing your request."},
-        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -209,7 +275,7 @@ def health_api(request):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def suggestions_api(request):
     suggestions = [
         "Show all enquiries",
@@ -232,7 +298,7 @@ def suggestions_api(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def reset_chat_api(request):
     try:
         from .services import get_chatbot_instance
@@ -267,13 +333,8 @@ class UserRegistrationView(APIView):
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
-
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer

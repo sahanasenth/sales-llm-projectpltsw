@@ -1,10 +1,20 @@
-import pytest
-from sales.models import Enquiry, Appointment, Feedback
 from datetime import date
+import pytest
+from django.contrib.auth import get_user_model
+from sales.models import Appointment, Enquiry, Feedback, Profile
 
 @pytest.mark.django_db
 class TestSalesModels:
-    
+
+    def test_create_profile(self):
+        User = get_user_model()
+        user = User.objects.create_user(username="testuser", password="testpassword")
+        profile = Profile.objects.get(user=user)
+        assert profile.role == 'sales'
+        profile.role = 'director'
+        profile.save()
+        assert profile.role == 'director'
+
     def test_create_enquiry(self):
         """Unit test to verify Enquiry model constraints and data save."""
         enquiry = Enquiry.objects.create(

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'sales',
 ]
 
+
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -136,4 +138,9 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
+
+SIMPLE_JWT = {
+    'TOKEN_OBTAIN_SERIALIZER': 'sales.serializers.MyTokenObtainPairSerializer',
+}
+
 

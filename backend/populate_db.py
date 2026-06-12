@@ -64,15 +64,34 @@ def populate_db():
 
     print("Creating 15 Feedbacks...")
     feedbacks = []
+    feedback_comments = [
+        "Great experience, very professional staff.",
+        "The vehicle was delivered on time, happy with the service.",
+        "Could have been a bit faster with the paperwork.",
+        "Sales executive was very knowledgeable about the features.",
+        "Good overall, but wait time was slightly long.",
+        "Excellent support and test drive experience.",
+        "Satisfied with the purchase process.",
+        "The showroom ambiance was nice, but follow-up was slow.",
+        "Amazing vehicle, and the team was very helpful.",
+        "Fair experience, nothing extraordinary."
+    ]
+
     for i in range(1, 16):
         linked_enq = random.choice(enquiries)
+        status_choice = random.choice(feedback_statuses)
+        rating_val = random.randint(1, 5) if status_choice == "Submitted" else 0
+        text_val = random.choice(feedback_comments) if status_choice == "Submitted" else ""
+
         fb = Feedback.objects.create(
             feedback_id=f"FB00{i}" if i < 10 else f"FB0{i}",
             enquiry_id=linked_enq.enquiry_id,
             customer=linked_enq.customer,
             vehicle=linked_enq.vehicle,
-            status=random.choice(feedback_statuses),
-            date=linked_enq.date + timedelta(days=random.randint(5, 20))
+            status=status_choice,
+            date=linked_enq.date + timedelta(days=random.randint(5, 20)),
+            rating=rating_val,
+            feedback_text=text_val
         )
         feedbacks.append(fb)
 

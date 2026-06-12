@@ -78,6 +78,9 @@ def _get_chatbot_test_module():
     return _chatbot_test_module
 
 
+_get_chatbot_test_module()
+
+
 class EmptySalesChatbot:
     """Fallback chatbot used when CRM tables are valid but contain no records."""
 
@@ -247,7 +250,6 @@ def process_chat_query(query: str) -> dict:
         }
         
     except Exception as e:
-
         return {
             "status": "error",
             "message": "An unexpected error occurred while processing your request."

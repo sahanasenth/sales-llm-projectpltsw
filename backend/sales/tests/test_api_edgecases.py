@@ -1,11 +1,11 @@
+from datetime import date
 import pytest
 from rest_framework import status
 from sales.models import Enquiry
-from datetime import date
 
 @pytest.mark.django_db
 class TestEnquiryAPIEdgeCases:
-    
+
     def test_valid_post_request(self, auth_client):
         """QA TestCase 1: Valid POST to Enquiry creation."""
         client = auth_client("sales_executive")
@@ -32,7 +32,7 @@ class TestEnquiryAPIEdgeCases:
         }
         res = client.post("/api/enquiry/create/", payload, format="json")
         assert res.status_code == status.HTTP_400_BAD_REQUEST
-        assert "id" in res.data # Should flag field as required
+        assert "id" in res.data  # Should flag field as required
 
     def test_empty_request_body(self, auth_client):
         """QA TestCase 4: Robustness against empty input."""
