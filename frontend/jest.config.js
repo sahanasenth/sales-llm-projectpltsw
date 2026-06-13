@@ -1,7 +1,6 @@
 module.exports = {
   testEnvironment: "jest-environment-jsdom",
-  collectCoverage: true,
-  coverageDirectory: "reports/coverage",
+  collectCoverage: false,
   coverageReporters: ["json", "text", "lcov", "clover"],
   coverageThreshold: {
     global: {
@@ -12,8 +11,7 @@ module.exports = {
     }
   },
   reporters: [
-    "default",
-    ["jest-junit", { outputDirectory: "reports", outputName: "junit.xml" }]
+    "default"
   ],
   testMatch: [
     "**/tests/unit/**/*.test.js",

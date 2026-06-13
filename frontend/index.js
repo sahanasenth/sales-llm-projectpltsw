@@ -1,4 +1,3 @@
-console.log("INDEX.JS IS RUNNING!");
 /* ═══════════════════════════════════════════════════════════════
    AUTH MODULE — Complete Frontend Authentication Workflow
 ═══════════════════════════════════════════════════════════════ */
