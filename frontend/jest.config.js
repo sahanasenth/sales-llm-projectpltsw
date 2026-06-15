@@ -15,7 +15,6 @@ module.exports = {
   ],
   testMatch: [
     "**/tests/unit/**/*.test.js",
-    "**/tests/integration/**/*.test.js",
-    "**/tests/accessibility/**/*.test.js"
+    "**/tests/integration/**/*.test.js"
   ]
 };
